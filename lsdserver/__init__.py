@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-
 import logging
 from flask import Flask
 app = Flask(__name__)
@@ -28,4 +27,3 @@ file_handler.setLevel(logging.DEBUG)
 app.logger.addHandler(file_handler)
 
 import lsdserver.views
-
