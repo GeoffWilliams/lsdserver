@@ -23,8 +23,9 @@ import unittest
 import lsdserver
 import tempfile
 from lsdserver import app
+from lsdserver import status
 
-class Test(unittest.TestCase):
+class TestRestApi(unittest.TestCase):
     """Unit tests for lsdserver."""
 
     def setUp(self):
@@ -47,6 +48,51 @@ class Test(unittest.TestCase):
     def test_empty_db(self):
         rv = self.app.get('/')
         assert 'Hello' in rv.data
+
+
+    #
+    # REST api tests
+    #
+
+    def testInvalidOperation(self):
+        resp = self.app.get('/testInvalidOperation')
+        print(resp.status_code)
+        self.assertEqual(status.NOT_FOUND,resp.status_code)
+
+    def testPlatformCreate(self):
+        pass
+
+    def testPlatformRead(self):
+        pass
+
+    def testPlatformReadItem(self):
+        pass
+    
+    def testPlatformDelete(self):
+        pass
+
+    def testSensorCreate(self):
+        pass
+
+    def testSensorRead(self):
+        pass
+
+    def testSensorReadItem(self):
+        pass
+
+    def testSensorDelete(self):
+        pass
+
+    def testPhenomenaCreate(self):
+        pass
+
+    def testPhenomenaRead(self):
+        pass
+    
+    def testPhenomenaDelete(self):
+        pass
+
+
 
 if __name__ == "__main__":
     unittest.main()
