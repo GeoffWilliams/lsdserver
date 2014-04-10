@@ -18,24 +18,47 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import json
-from lsdserver import app
-app.logger.debug("**** inside view.py ****")
-from flask import render_template
+#from lsdserver import app
+#app.logger.debug("**** inside view.py ****")
+from flask import render_template, current_app
+from lsdserver import status
+from lsdserver.config import system
 
 
+#@app.route('/')
+#def index():
+    #"""
+    #Main entry point
+    #"""
+    #system.hello()
+    #return render_template('index.html')
 
-@app.route('/')
-def index():
-    """
-    Main entry point
-    """
-    return render_template('index.html')
+
+#@app.route('/platforms', methods=['POST'])
+#def platformsList():
+    #return render_template('platforms.html'), status.CREATED
+
+
+#@app.route('/platforms', methods=['GET'])
+#def platformsItem():
+    #return render_template('platforms.html'), status.CREATED
+
+
+#@app.route('/platforms', methods=['GET'])
+#def platformsCreate():
+    #return render_template('platforms.html'), status.CREATED
+
+
+#@app.route('/platforms', methods=['DELETE'])
+#def platformsDelete():
+    #return render_template('platforms.html'), status.CREATED
 
 @app.errorhandler(404)
 def not_found_error(error):
-    return render_template('404.html'), 404
+    return render_template('404.html'), status.NOT_FOUND
+
 
 @app.errorhandler(500)
 def internal_error(error):
     db.session.rollback()
-    return render_template('500.html'), 500
+    return render_template('500.html'), status.SERVER_ERROR

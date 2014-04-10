@@ -22,52 +22,69 @@ sys.path.append("..")
 import unittest
 import lsdserver
 import tempfile
-from lsdserver import app
+from lsdserver import create_app
 from lsdserver import status
+from lsdserver.config import Config
+
+class MockSystem():
+
+    def hello(self):
+        return "hello mock"
+
 
 class TestRestApi(unittest.TestCase):
     """Unit tests for lsdserver."""
+    app = None
+    client = None
 
     def setUp(self):
-        #app.config['TESTING'] = True
-        #app.config['CSRF_ENABLED'] = False
-        #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'test.db')
-        #self.app = app.test_client()
-        #db.create_all()
+        #print("setup tests")
+        Config.system = MockSystem()
+        #self.db_fd, lsdserver.app.config['DATABASE'] = tempfile.mkstemp()
+       # lsdserver.app.config['TESTING'] = True
 
-        self.db_fd, lsdserver.app.config['DATABASE'] = tempfile.mkstemp()
-        lsdserver.app.config['TESTING'] = True
-        self.app = lsdserver.app.test_client()
+        self.app = create_app()
+        self.client = self.app.test_client()
 #        lsdserver.init_db()
 
     def tearDown(self):
 #        db.session.remove()
 #        db.drop_all()
-        os.unlink(lsdserver.app.config['DATABASE'])
+       # os.unlink(lsdserver.app.config['DATABASE'])
+        pass
 
-    def test_empty_db(self):
-        rv = self.app.get('/')
-        assert 'Hello' in rv.data
+    #def test_empty_db(self):
+        #rv = self.client.get('/')
+        #assert 'Hello' in rv.data
 
 
     #
     # REST api tests
     #
-
     def testInvalidOperation(self):
-        resp = self.app.get('/testInvalidOperation')
-        print(resp.status_code)
-        self.assertEqual(status.NOT_FOUND,resp.status_code)
+        resp = self.client.get('/testInvalidOperation')
+        print(resp.data)
+        #self.assertEqual(status.NOT_FOUND,resp.status_code)
+        pass
 
     def testPlatformCreate(self):
-        pass
+        resp = self.client.post('/mir', data=dict(
+            identifier="abc123",
+            longitude="0",
+            latitude="0",
+            srs="epsg:4326",
+            name="abc plaform",
+            description="abc test plaform",
+            link="http://google.com"
+        ))
+        self.assertEquals(status.CREATED, resp.status_code)
 
     def testPlatformRead(self):
         pass
 
     def testPlatformReadItem(self):
         pass
-    
+
     def testPlatformDelete(self):
         pass
 
@@ -88,7 +105,7 @@ class TestRestApi(unittest.TestCase):
 
     def testPhenomenaRead(self):
         pass
-    
+
     def testPhenomenaDelete(self):
         pass
 
