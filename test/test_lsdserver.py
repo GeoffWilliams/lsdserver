@@ -25,62 +25,94 @@ import tempfile
 from lsdserver import create_app
 from lsdserver import status
 from lsdserver.config import Config
+import flask
+from flask import render_template, current_app
 
 class MockSystem():
 
-    def hello(self):
-        return "hello mock"
+    platforms = {}
 
+    def get_platform(self, platform_id):
+        data = None
+        if platform_id in self.platforms:
+            data = self.platforms[platform_id]
+        else:
+            flask.abort(status.NOT_FOUND)
+        return data
+
+    def create_platform(self, platform_id, data):
+        print data
+        self.platforms[platform_id] = data
+
+    def delete_platform(self, platform_id):
+        if platform_id in self.platforms:
+            self.platforms[platform_id] = None
 
 class TestRestApi(unittest.TestCase):
     """Unit tests for lsdserver."""
     app = None
     client = None
+    sample_platform = dict(
+            longitude="50",
+            latitude="80",
+            srs="epsg:4326",
+            name="myplaform name",
+            description="myplaform description",
+            link="http://google.com"
+        )
 
     def setUp(self):
-        #print("setup tests")
         Config.system = MockSystem()
-        #self.db_fd, lsdserver.app.config['DATABASE'] = tempfile.mkstemp()
        # lsdserver.app.config['TESTING'] = True
 
         self.app = create_app()
         self.client = self.app.test_client()
-#        lsdserver.init_db()
 
     def tearDown(self):
-#        db.session.remove()
-#        db.drop_all()
-       # os.unlink(lsdserver.app.config['DATABASE'])
         pass
-
-    #def test_empty_db(self):
-        #rv = self.client.get('/')
-        #assert 'Hello' in rv.data
 
 
     #
     # REST api tests
     #
-    def testInvalidOperation(self):
-        resp = self.client.get('/testInvalidOperation')
+    def test_invalid_platform(self):
+        resp = self.client.get('/invalid_platform')
         print(resp.data)
-        #self.assertEqual(status.NOT_FOUND,resp.status_code)
-        pass
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
 
-    def testPlatformCreate(self):
-        resp = self.client.post('/mir', data=dict(
-            identifier="abc123",
-            longitude="0",
-            latitude="0",
-            srs="epsg:4326",
-            name="abc plaform",
-            description="abc test plaform",
-            link="http://google.com"
-        ))
+    def test_invalid_sensor(self):
+        resp = self.client.get('/invalid_platform/invalid_sensor')
+        print(resp.data)
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
+
+    def test_invalid_observation(self):
+        resp = self.client.get('/invalid_platform/invalid_sensor/invalid_obs')
+        print(resp.data)
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
+
+    def test_platform_create(self):
+        resp = self.client.post('/myplatform', data=self.sample_platform)
         self.assertEquals(status.CREATED, resp.status_code)
 
+    def test_platform_delete(self):
+        # put a platform...
+        Config.system.create_platform("deleteme", "DATA")
+
+        # then try to delete it
+        resp = self.client.delete('/deleteme')
+        self.assertEquals(status.OK, resp.status_code)
+
+        # and check you get a 404 if you try to access old platform
+        resp = self.client.get('/deleteme')
+        self.assertEquals(status.NOT_FOUND, resp.status_code)
+
     def testPlatformRead(self):
-        pass
+        # put a platform...
+        Config.system.create_platform("myplatform", self.sample_platform)
+
+        resp = self.client.get('/myplatform')
+        self.assertEquals(status.OK, resp.status_code)
+        self.assertEquals(self.sample_platform, resp.data)
 
     def testPlatformReadItem(self):
         pass
