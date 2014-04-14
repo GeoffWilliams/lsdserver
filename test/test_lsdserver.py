@@ -27,6 +27,8 @@ from lsdserver import status
 from lsdserver.config import Config
 import flask
 from flask import render_template, current_app
+import json
+
 
 class MockSystem():
 
@@ -46,7 +48,7 @@ class MockSystem():
 
     def delete_platform(self, platform_id):
         if platform_id in self.platforms:
-            self.platforms[platform_id] = None
+            del self.platforms[platform_id]
 
 class TestRestApi(unittest.TestCase):
     """Unit tests for lsdserver."""
@@ -63,9 +65,9 @@ class TestRestApi(unittest.TestCase):
 
     def setUp(self):
         Config.system = MockSystem()
-       # lsdserver.app.config['TESTING'] = True
 
         self.app = create_app()
+        self.app.config['TESTING'] = True
         self.client = self.app.test_client()
 
     def tearDown(self):
@@ -77,21 +79,18 @@ class TestRestApi(unittest.TestCase):
     #
     def test_invalid_platform(self):
         resp = self.client.get('/invalid_platform')
-        print(resp.data)
         self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     def test_invalid_sensor(self):
         resp = self.client.get('/invalid_platform/invalid_sensor')
-        print(resp.data)
         self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     def test_invalid_observation(self):
         resp = self.client.get('/invalid_platform/invalid_sensor/invalid_obs')
-        print(resp.data)
         self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     def test_platform_create(self):
-        resp = self.client.post('/myplatform', data=self.sample_platform)
+        resp = self.client.post('/myplatform')
         self.assertEquals(status.CREATED, resp.status_code)
 
     def test_platform_delete(self):
@@ -110,9 +109,14 @@ class TestRestApi(unittest.TestCase):
         # put a platform...
         Config.system.create_platform("myplatform", self.sample_platform)
 
-        resp = self.client.get('/myplatform')
+        # ask for platform in JSON
+        resp = self.client.get('/myplatform', data=self.sample_platform,
+                headers={'Accept': 'application/json'})
         self.assertEquals(status.OK, resp.status_code)
-        self.assertEquals(self.sample_platform, resp.data)
+
+        # parse the JSON
+        json_data = json.loads(resp.data)
+        self.assertEquals(self.sample_platform, json_data)
 
     def testPlatformReadItem(self):
         pass
