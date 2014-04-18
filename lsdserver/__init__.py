@@ -21,13 +21,15 @@
 import logging
 from flask import Flask, render_template
 from lsdserver.platforms import platforms
+from lsdserver.parameters import parameters
 from lsdserver.config import Config
 from lsdserver import status
 
 def create_app():
     app = Flask(__name__)
     # app.config.from_pyfile(config_filename)
-    app.register_blueprint(platforms)
+    app.register_blueprint(platforms, url_prefix='/repository')
+    app.register_blueprint(parameters, url_prefix='/parameters')
     app.debug = True
     file_handler = logging.FileHandler(filename='lsdserver.log')
     file_handler.setLevel(logging.DEBUG)
@@ -35,12 +37,17 @@ def create_app():
     app.system = Config.system
     # general stuff - error pages etc
     app.errorhandler(404)(not_found_error)
+    app.errorhandler(408)(conflict_error)
     app.errorhandler(500)(internal_error)
     return app
 
 
 def not_found_error(error):
     return render_template('404.html'), status.NOT_FOUND
+
+
+def conflict_error(error):
+    return render_template('409.html'), status.CONFLICT
 
 
 def internal_error(error):
