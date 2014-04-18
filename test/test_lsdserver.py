@@ -24,6 +24,7 @@ import lsdserver
 import tempfile
 from lsdserver import create_app
 from lsdserver import status
+from lsdserver.validator import Validator
 from lsdserver.config import Config
 import flask
 from flask import render_template, current_app
@@ -156,11 +157,7 @@ class TestRestApi(unittest.TestCase):
     )
 
     def setUp(self):
-        print("RESET")
         Config.system = MockSystem()
-        #print(len(Config.system.platforms))
-        #print(len(Config.system.parameters))
-        #print(len(Config.system.sensors))
 
         self.app = create_app()
         self.app.config['TESTING'] = True
@@ -374,6 +371,61 @@ class TestRestApi(unittest.TestCase):
         resp = self.client.get('/parameters/' + self.sample_parameter_id)
         self.assertEquals(status.NOT_FOUND, resp.status_code)
 
+
+class TestValidator(unittest.TestCase):
+    """
+    Tests for identifier and data structure validator
+    """
+    invalid_identifier = "invalid!identifier%"
+    valid_identifier = "valid_identifier"
+
+    def setUp(self):
+        self.validator = Validator()
+
+    def tearDown(self):
+        pass
+
+    def test_valid_identifier(self):
+        self.assertTrue(
+            self.validator.validate_identifier(
+                TestValidator.valid_identifier))
+
+    def test_invalid_identifier(self):
+        self.assertFalse(
+            self.validator.validate_identifier(
+                TestValidator.invalid_identifier))
+
+    def test_valid_parameter_types(self):
+        self.assertTrue(self.validator.validate_parameter_type("int"))
+        self.assertTrue(self.validator.validate_parameter_type("float"))
+        self.assertTrue(self.validator.validate_parameter_type("boolean"))
+
+    def test_invalid_parameter_types(self):
+        self.assertFalse(self.validator.validate_parameter_type("invalid"))
+
+    def test_valid_platform(self):
+        pass
+
+    def test_invalid_platform(self):
+        pass
+
+    def test_valid_parameter(self):
+        pass
+
+    def test_invalid_parameter(self):
+        pass
+
+    def test_valid_sensor(self):
+        pass
+
+    def test_invalid_sensor(self):
+        pass
+
+    def test_valid_observation(self):
+        pass
+
+    def test_invalid_observation(self):
+        pass
 
 if __name__ == "__main__":
     unittest.main()
