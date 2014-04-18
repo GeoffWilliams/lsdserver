@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import re
-
+from dateutil import parser
 
 class Validator:
     """
@@ -30,24 +30,38 @@ class Validator:
         name=True,
         description=False,
         type=True,
-        range=False,
+        uom=False,
+        min_value=False,
+        max_value=False,
         link=False
     )
 
-    parameter_supported_fields = dict(
-        name=True,
+    platform_supported_fields = dict(
+        name=False,
+        manufacturer=False,
+        model=False,
+        serial_number=False,
         description=False,
-        type=True,
-        range=False,
-        link=False
+        link=False,
+        mobile=False,
+        position=False
     )
 
-    parameter_supported_fields = dict(
-        name=True,
+    sensor_supported_fields = dict(
+        name=False,
+        manufacturer=False,
+        model=False,
+        serial_number=False,
         description=False,
-        type=True,
-        range=False,
-        link=False
+        parameters=True,
+        link=False,
+        position=False
+    )
+
+    observation_supported_fields = dict(
+        times=False,
+        parameters=True,
+        values=True
     )
 
     parameter_type_support = {"int", "float", "boolean"}
@@ -55,8 +69,34 @@ class Validator:
     # one or more letters, numbers and underscores
     identifier_regexp = re.compile('^\w+$')
 
+    # positions should be specified as OGC WKT - at the moment we only support
+    # points.  Complex movements (linestrings) can be computed from these point
+    # values when stored in the database to show movement, etc.  We may one day
+    # want to allow polygons here to indicate a coverage, etc
+    position_regexp = re.compile(
+        '^POINT \((\+|-)?\d+(\.\d+)? (\+|-)?\d+(\.\d+)?\)$'
+    )
+
     def __init__(self):
         pass
+
+    def validate_position(self, position):
+        """
+        Validate a position - it should specify a point using OGC WKT
+        """
+        return Validator.position_regexp.match(position) is not None
+
+    def validate_time_string(self, time_string):
+        """
+        Validate a time string using the dateutil package
+
+        Returns a datetime instance on successful parsing or False on error
+        """
+        try:
+            value = parser.parse(time_string)
+        except ValueError:
+            value = False
+        return value
 
     def validate_parameter_type(self, parameter_type):
         return parameter_type in Validator.parameter_type_support

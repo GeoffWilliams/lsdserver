@@ -403,6 +403,26 @@ class TestValidator(unittest.TestCase):
     def test_invalid_parameter_types(self):
         self.assertFalse(self.validator.validate_parameter_type("invalid"))
 
+    def test_valid_location(self):
+        self.assertTrue(self.validator.validate_position("POINT (50 50)"))
+        self.assertTrue(self.validator.validate_position("POINT (-50 -50)"))
+        self.assertTrue(self.validator.validate_position("POINT (+50 +50)"))
+        self.assertTrue(self.validator.validate_position("POINT (-5.1 +5.92)"))
+
+    def test_invalid_location(self):
+        self.assertFalse(self.validator.validate_position("POINT(-5.01,+5.92)"))
+        self.assertFalse(self.validator.validate_position("nonsense"))
+
+    def test_valid_time_string(self):
+        self.assertTrue(self.validator.validate_time_string(
+            "2013-11-26T20:25:12.014Z") is not None)
+
+    def test_invalid_time_string(self):
+        self.assertFalse(self.validator.validate_time_string(
+            "2013-30-11T20:25:12.014Z"))
+        self.assertFalse(self.validator.validate_time_string(
+            "nonsense"))
+
     def test_valid_platform(self):
         pass
 
