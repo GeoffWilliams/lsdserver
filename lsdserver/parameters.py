@@ -26,6 +26,7 @@ parameters = Blueprint('parameters', __name__,
                         template_folder='templates')
 
 
+
 def want_json():
     current_app.logger.debug(
         "request.accept_mimetypes: " + str(request.accept_mimetypes))
