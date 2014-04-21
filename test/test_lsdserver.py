@@ -30,9 +30,11 @@ import flask
 from flask import render_template, current_app
 import json
 import logging
+from lsdserver.backend.mysql import Mysql
+from lsdserver.driver import LsdBackend
 
 
-class MockSystem():
+class MockSystem(object):
     logger = logging.getLogger('lsdserver.MockSystem')
     logger.setLevel(logging.DEBUG)
 
@@ -123,6 +125,7 @@ class MockSystem():
 
     def get_parameters(self):
         return self.parameters
+LsdBackend.register(MockSystem)
 
 
 class TestRestApi(unittest.TestCase):
@@ -618,6 +621,13 @@ class TestValidator(unittest.TestCase):
     def test_value_invalid(self):
         self.assertFalse(self.validator.validate_value("int", "abc"))
         self.assertFalse(self.validator.validate_value("float", "abc"))
+
+
+class TestMysqlBackend(unittest.TestCase):
+
+    def __init__(self):
+        self.system = Mysql()
+
 
 if __name__ == "__main__":
     unittest.main()

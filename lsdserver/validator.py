@@ -244,7 +244,8 @@ class Validator:
                     # time was set - ensure its valid
                     if not self.validate_time_string(observation["time"]):
                         valid = False
-                        error_messages.append("invalid time component: " + observation["time"])
+                        error_messages.append(
+                            "invalid time component: " + observation["time"])
                 else:
                     # a parameter key - validate it
                     if not self.validate_parameter_id(key):
@@ -256,14 +257,13 @@ class Validator:
                         value = observation[key]
                         if not self.validate_value(value_type, value):
                             valid = False
-                            error_messages.append("inappropriate value %s for parameter %s" % (str(value), key))
+                            error_messages.append(
+                                "inappropriate value %s for parameter %s"
+                                % (value, key))
         else:
             # empty
             valid = False
             error_messages.append("no observation contained in structure")
-
-        print "---------------------> " + str(error_messages)
-
         return valid
 
     def validate_value(self, value_type, value):
@@ -273,7 +273,6 @@ class Validator:
         except ValueError:
             valid = False
         except KeyError:
-            print("$$$$$$$$$$$$$$$$$$$$$$ " + str(self.parameter_type_support.keys()) + "**** " + str(value_type))
             valid = False
 
         return valid

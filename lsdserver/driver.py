@@ -16,11 +16,53 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-import abc
 
-class Driver(object):
-    __metaclass__  = abc.ABCMeta
+from abc import ABCMeta, abstractmethod
 
-    @abc.abstractmethod
-    def get_radius(self):
-         """Method that should do something."""
+
+class LsdBackend(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def get_platform(self, platform_id):
+        pass
+
+    @abstractmethod
+    def get_sensor(self, platform_id, sensor_id):
+        pass
+
+    @abstractmethod
+    def get_platforms(self):
+        pass
+
+    @abstractmethod
+    def create_platform(self, platform_id, data):
+        pass
+
+    @abstractmethod
+    def create_sensor(self, platform_id, sensor_id, data):
+        pass
+
+    @abstractmethod
+    def delete_platform(self, platform_id):
+        pass
+
+    @abstractmethod
+    def delete_sensor(self, platform_id, sensor_id):
+        pass
+
+    @abstractmethod
+    def create_parameter(self, parameter_id, data):
+        pass
+
+    @abstractmethod
+    def get_parameter(self, parameter_id):
+        pass
+
+    @abstractmethod
+    def delete_parameter(self, parameter_id):
+        pass
+
+    @abstractmethod
+    def get_parameters(self):
+        pass
