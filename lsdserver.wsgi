@@ -1,6 +1,8 @@
 # settings for wsgi/apache (? - untested!)
 import sys
 import os
-sys.path.append(os.path.dirname(__file__))
+app_dir = os.path.dirname(__file__)
+sys.path.append(app_dir)
 
-from lsdserver import app as application
+from lsdserver import create_app
+app = create_app(app_dir)

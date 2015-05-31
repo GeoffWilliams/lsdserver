@@ -19,21 +19,49 @@
 
 
 import logging
+import os
 from flask import Flask, render_template
 from lsdserver.platforms import platforms
 from lsdserver.parameters import parameters
 from lsdserver.config import Config
 from lsdserver import status
 
-def create_app():
+
+def load_config(app, name, app_dir):
+    """
+    Read a config file from a well-known location
+    """
+    app.debug = True
+    config_file = name + ".cfg"
+    
+    # /etc/NAME.cfg
+    etc_config_file = "/etc/" + config_file
+    rel_config_file = app_dir + "/" + config_file
+    if os.path.isfile(etc_config_file):
+        f = etc_config_file
+    elif os.path.isfile(rel_config_file):
+        f = rel_config_file
+    else:
+        f = None
+        app.logger.error("No %s found!" % config_file)
+
+    if f:
+        app.logger.info("config file: %s" % f)
+        app.config.from_pyfile(f)        
+
+        if app.config.logdir:
+            logfile = app.config.logdir + "lsdserver.log"
+            app.logger.info("logging to %s" % logfile)
+            file_handler = logging.FileHandler(logfile)
+            file_handler.setLevel(logging.DEBUG)
+            app.logger.addHandler(file_handler)
+
+def create_app(app_dir):
     app = Flask(__name__)
-    # app.config.from_pyfile(config_filename)
+    load_config(app, __name__, app_dir)
+
     app.register_blueprint(platforms, url_prefix='/repository')
     app.register_blueprint(parameters, url_prefix='/parameters')
-    app.debug = True
-    file_handler = logging.FileHandler(filename='lsdserver.log')
-    file_handler.setLevel(logging.DEBUG)
-    app.logger.addHandler(file_handler)
     app.system = Config.system
     # general stuff - error pages etc
     app.errorhandler(404)(not_found_error)
