@@ -23,6 +23,7 @@ import os
 from flask import Flask, render_template
 from lsdserver.platforms import platforms
 from lsdserver.parameters import parameters
+from lsdserver.ui import ui
 from lsdserver.config import Config
 from lsdserver import status
 
@@ -62,6 +63,7 @@ def create_app(app_dir):
 
     app.register_blueprint(platforms, url_prefix='/repository')
     app.register_blueprint(parameters, url_prefix='/parameters')
+    app.register_blueprint(ui, url_prefix="")
     app.system = Config.system
     # general stuff - error pages etc
     app.errorhandler(404)(not_found_error)
@@ -83,6 +85,3 @@ def internal_error(error):
     return render_template('500.html'), status.SERVER_ERROR
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
