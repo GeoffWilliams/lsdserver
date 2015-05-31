@@ -83,7 +83,6 @@ def internal_error(error):
     return render_template('500.html'), status.SERVER_ERROR
 
 
-
-
-
-
+@app.route('/')
+def hello_world():
+    return 'Hello World!'
