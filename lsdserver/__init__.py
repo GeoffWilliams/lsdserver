@@ -61,7 +61,7 @@ def create_app(app_dir):
     app = Flask(__name__)
     load_config(app, __name__, app_dir)
 
-    app.register_blueprint(platforms, url_prefix='/repository')
+    app.register_blueprint(platforms, url_prefix='/platforms')
     app.register_blueprint(parameters, url_prefix='/parameters')
     app.register_blueprint(ui, url_prefix="")
     app.system = Config.system

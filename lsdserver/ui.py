@@ -37,4 +37,7 @@ def index():
     """
     Get the list of platforms
     """
-    return "hello world!"
+    payload = render_template('index.html')
+    current_app.logger.debug('payload: ' + str(payload))
+    return payload, status.OK
+
