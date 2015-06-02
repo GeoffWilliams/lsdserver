@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 import os
-sys.path.append("..")
+sys.path.append(os.path.dirname(__file__) + "/..")
 import unittest
 import lsdserver
 import tempfile
