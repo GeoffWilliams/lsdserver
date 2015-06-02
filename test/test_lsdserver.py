@@ -18,7 +18,8 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 import sys
 import os
-sys.path.append(os.path.dirname(__file__) + "/..")
+APP_DIR = os.path.dirname(__file__) + "/.."
+sys.path.append(APP_DIR)
 import unittest
 import lsdserver
 import tempfile
@@ -160,7 +161,7 @@ class TestRestApi(unittest.TestCase):
     def setUp(self):
         Config.system = MockSystem()
 
-        self.app = create_app()
+        self.app = create_app(APP_DIR)
         self.app.config['TESTING'] = True
         self.client = self.app.test_client()
 
@@ -177,20 +178,20 @@ class TestRestApi(unittest.TestCase):
     # Platform API
     #
     def test_invalid_platform(self):
-        resp = self.client.get('/repository/invalid_platform')
+        resp = self.client.get('/platforms/invalid_platform')
         self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     def test_invalid_sensor(self):
-        resp = self.client.get('/repository/invalid_platform/invalid_sensor')
+        resp = self.client.get('/platforms/invalid_platform/invalid_sensor')
         self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     def test_invalid_observation(self):
         resp = self.client.get(
-            '/repository/invalid_platform/invalid_sensor/invalid_obs')
+            '/platforms/invalid_platform/invalid_sensor/invalid_obs')
         self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     def test_platform_create(self):
-        resp = self.client.post('/repository/' + self.sample_platform_id,
+        resp = self.client.post('/platforms/' + self.sample_platform_id,
                 data=self.sample_platform,)
         self.assertEquals(status.CREATED, resp.status_code)
 
@@ -201,7 +202,7 @@ class TestRestApi(unittest.TestCase):
         """
         Config.system.create_platform(
             self.sample_platform_id, self.sample_platform)
-        resp = self.client.post('/repository/' + self.sample_platform_id,
+        resp = self.client.post('/platforms/' + self.sample_platform_id,
                 data=self.sample_platform,)
         self.assertEquals(status.CONFLICT, resp.status_code)
 
@@ -210,11 +211,11 @@ class TestRestApi(unittest.TestCase):
         Config.system.create_platform("deleteme", "DATA")
 
         # then try to delete it
-        resp = self.client.delete('/repository/deleteme')
+        resp = self.client.delete('/platforms/deleteme')
         self.assertEquals(status.OK, resp.status_code)
 
         # and check you get a 404 if you try to access old platform
-        resp = self.client.get('/repository/deleteme')
+        resp = self.client.get('/platforms/deleteme')
         self.assertEquals(status.NOT_FOUND, resp.status_code)
 
     def test_platform_read_item(self):
@@ -223,7 +224,7 @@ class TestRestApi(unittest.TestCase):
             self.sample_platform_id, self.sample_platform)
 
         # ask for platform in JSON
-        resp = self.client.get('/repository/' + self.sample_platform_id,
+        resp = self.client.get('/platforms/' + self.sample_platform_id,
                 headers={'Accept': 'application/json'})
         self.assertEquals(status.OK, resp.status_code)
 
@@ -237,7 +238,7 @@ class TestRestApi(unittest.TestCase):
             self.sample_platform_id, self.sample_platform)
 
         # ask for list of platforms in JSON
-        resp = self.client.get('/repository/',
+        resp = self.client.get('/platforms/',
                 headers={'Accept': 'application/json'})
         self.assertEquals(status.OK, resp.status_code)
 
@@ -255,7 +256,7 @@ class TestRestApi(unittest.TestCase):
             self.sample_platform_id, self.sample_platform)
 
         # put a sensor
-        resp = self.client.post('/repository/' + self.sample_platform_id +
+        resp = self.client.post('/platforms/' + self.sample_platform_id +
                 "/" + self.sample_sensor_id, data=self.sample_sensor)
         self.assertEquals(status.CREATED, resp.status_code)
 
@@ -268,14 +269,14 @@ class TestRestApi(unittest.TestCase):
             self.sample_platform_id, self.sample_platform)
         Config.system.create_sensor(
             self.sample_platform_id, self.sample_sensor_id, self.sample_sensor)
-        resp = self.client.post('/repository/' +
+        resp = self.client.post('/platforms/' +
                 self.sample_platform_id + "/" + self.sample_sensor_id,
                 data=self.sample_sensor,)
         self.assertEquals(status.CONFLICT, resp.status_code)
 
     def test_sensor_create_no_platform(self):
         # put a sensor on a non-existant platform - must raise error
-        resp = self.client.post('/repository/nothere/' + self.sample_sensor_id,
+        resp = self.client.post('/platforms/nothere/' + self.sample_sensor_id,
                 data=self.sample_sensor)
         self.assertEquals(status.NOT_FOUND, resp.status_code)
 
@@ -286,7 +287,7 @@ class TestRestApi(unittest.TestCase):
         Config.system.create_sensor(
             self.sample_platform_id, self.sample_sensor_id, self.sample_sensor)
 
-        resp = self.client.get('/repository/' +
+        resp = self.client.get('/platforms/' +
                 self.sample_platform_id + '/' + self.sample_sensor_id,
                 headers={'Accept': 'application/json'})
         self.assertEquals(status.OK, resp.status_code)
@@ -306,17 +307,17 @@ class TestRestApi(unittest.TestCase):
             self.sample_platform_id, self.sample_sensor_id, self.sample_sensor)
 
         # delete it
-        resp = self.client.delete('/repository/' +
+        resp = self.client.delete('/platforms/' +
                 self.sample_platform_id + '/' + self.sample_sensor_id)
         self.assertEquals(status.OK, resp.status_code)
 
         # check get now gives not found
-        resp = self.client.get('/repository/' +
+        resp = self.client.get('/platforms/' +
                 self.sample_platform_id + '/' + self.sample_sensor_id)
         self.assertEquals(status.NOT_FOUND, resp.status_code)
 
         # check platform wasn't accidentally deleted
-        resp = self.client.get('/repository/' + self.sample_platform_id)
+        resp = self.client.get('/platforms/' + self.sample_platform_id)
         self.assertEquals(status.OK, resp.status_code)
 
 

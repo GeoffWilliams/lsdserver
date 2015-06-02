@@ -31,7 +31,6 @@ def want_json():
         "request.accept_mimetypes: " + str(request.accept_mimetypes))
     json = 'application/json' in request.accept_mimetypes
     current_app.logger.debug("use json: " + str(json))
-    json = False
     return json
 
 @platforms.route('/', methods=['GET'])

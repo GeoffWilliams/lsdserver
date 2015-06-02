@@ -106,9 +106,14 @@ class Validator:
 
         Returns a datetime instance on successful parsing or False on error
         """
-        try:
-            value = parser.parse(time_string)
-        except ValueError:
+        if time_string:
+            try:
+                value = parser.parse(time_string)
+            except ValueError:
+                value = False
+            except TypeError:
+                value = False
+        else:
             value = False
         return value
 
