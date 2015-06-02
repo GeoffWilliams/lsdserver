@@ -22,6 +22,7 @@ from lsdserver.driver import LsdBackend
 
 
 class Mysql(object):
-    pass
+    def get_platforms(self):
+       return {"stub platforms"}
 
 LsdBackend.register(Mysql)

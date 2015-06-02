@@ -29,8 +29,10 @@ platforms = Blueprint('platforms', __name__,
 def want_json():
     current_app.logger.debug(
         "request.accept_mimetypes: " + str(request.accept_mimetypes))
-    return 'application/json' in request.accept_mimetypes
-
+    json = 'application/json' in request.accept_mimetypes
+    current_app.logger.debug("use json: " + str(json))
+    json = False
+    return json
 
 @platforms.route('/', methods=['GET'])
 def get_platform_list():
