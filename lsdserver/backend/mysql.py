@@ -19,17 +19,50 @@
 
 import flask
 from lsdserver.driver import LsdBackend
+from lsdserver.driver import Platform
+from lsdserver.driver import Parameter
+from lsdserver.driver import Sensor
 
 
-class Mysql(object):
+#fixme!! rename to sql alchemy
+
+
+class Mysql(LsdBackend):
+
+    session = None
 
     def get_platform(self, platform_id):
-        return {}
+        return self.session.query(Platform).filter(Platform.id == platform_id).first()
+
+    def get_sensor(self, platform_id, sensor_id):
+        pass
 
     def get_platforms(self):
-        return {}
+        pass
+
+    def create_platform(self, platform_id, data):
+        pass
+
+    def create_sensor(self, platform_id, sensor_id, data):
+        pass
+
+    def delete_platform(self, platform_id):
+        pass
+
+    def delete_sensor(self, platform_id, sensor_id):
+        pass
+
+    def create_parameter(self, parameter_id, data):
+        pass
+
+    def get_parameter(self, parameter_id):
+        pass
+
+    def delete_parameter(self, parameter_id):
+        pass
 
     def get_parameters(self):
-        return {}
+        pass
+
 
 LsdBackend.register(Mysql)

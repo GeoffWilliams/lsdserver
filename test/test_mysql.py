@@ -45,8 +45,10 @@ class TestMysql(unittest.TestCase):
         cls.run_sql("DROP DATABASE IF EXISTS " + cls.db_name)
         cls.run_sql("CREATE DATABASE " + cls.db_name)
 
+
     def setUp(self):
         self.create_db()
+        self.backend.session = self.db_session
 
     def tearDown(self):
         self.drop_db()
@@ -81,7 +83,7 @@ class TestMysql(unittest.TestCase):
 
     def test_get_platform_empty(self):
         data = self.backend.get_platform("abc")
-        self.assertEqual(data, {})
+        self.assertEqual(data, None)
 
     def test_get_platform_data(self):
         self.demo_platform()
