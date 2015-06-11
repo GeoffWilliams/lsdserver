@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from flask import Blueprint, render_template, abort, request, current_app
 from jinja2 import TemplateNotFound
-from lsdserver.config import Config
 from lsdserver import status
 import flask
 
@@ -39,7 +38,7 @@ def get_parameter_list():
     Get the list of platforms
     """
     current_app.logger.debug("get_parameter_list()")
-    data = Config.system.get_parameters()
+    data = current_app.system.get_parameters()
     if want_json():
         payload = flask.jsonify(data)
     else:
@@ -54,7 +53,7 @@ def get_parameter_item(parameter_id):
     Get the list of platforms
     """
     current_app.logger.debug("get_parameter_item(%s)" % parameter_id)
-    data = Config.system.get_parameter(parameter_id)
+    data = current_app.system.get_parameter(parameter_id)
     if want_json():
         payload = flask.jsonify(data)
     else:
@@ -69,7 +68,7 @@ def delete_parameter(parameter_id):
     Get the list of platforms
     """
     current_app.logger.debug("delete_parameter(%s)" % parameter_id)
-    data = Config.system.delete_parameter(parameter_id)
+    data = current_app.system.delete_parameter(parameter_id)
     if want_json():
         payload = flask.jsonify(data)
     else:
@@ -84,7 +83,7 @@ def create_parameter(parameter_id):
     Get the list of platforms
     """
     current_app.logger.debug("create_parameter(%s)" % parameter_id)
-    data = Config.system.create_parameter(
+    data = current_app.system.create_parameter(
             parameter_id, flask.request.get_data())
     if want_json():
         payload = flask.jsonify(data)

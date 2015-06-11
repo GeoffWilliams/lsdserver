@@ -26,7 +26,6 @@ import tempfile
 from lsdserver import create_app
 from lsdserver import status
 from lsdserver.validator import Validator
-from lsdserver.config import Config
 import flask
 from flask import render_template, current_app
 import json
@@ -159,10 +158,9 @@ class TestRestApi(unittest.TestCase):
     }
 
     def setUp(self):
-        Config.system = MockSystem()
-
         self.app = create_app(APP_DIR)
         self.app.config['TESTING'] = True
+        self.app.system = MockSystem()
         self.client = self.app.test_client()
 
     def tearDown(self):
@@ -200,7 +198,7 @@ class TestRestApi(unittest.TestCase):
         make a platform using api, then put identical one using REST and ensure
         it fails
         """
-        Config.system.create_platform(
+        self.app.system.create_platform(
             self.sample_platform_id, self.sample_platform)
         resp = self.client.post('/platforms/' + self.sample_platform_id,
                 data=self.sample_platform,)
@@ -208,7 +206,7 @@ class TestRestApi(unittest.TestCase):
 
     def test_platform_delete(self):
         # put a platform...
-        Config.system.create_platform("deleteme", "DATA")
+        self.app.system.create_platform("deleteme", "DATA")
 
         # then try to delete it
         resp = self.client.delete('/platforms/deleteme')
@@ -220,7 +218,7 @@ class TestRestApi(unittest.TestCase):
 
     def test_platform_read_item(self):
         # put a platform...
-        Config.system.create_platform(
+        self.app.system.create_platform(
             self.sample_platform_id, self.sample_platform)
 
         # ask for platform in JSON
@@ -234,7 +232,7 @@ class TestRestApi(unittest.TestCase):
 
     def test_platform_read_list(self):
         # put a platform...
-        Config.system.create_platform(
+        self.app.system.create_platform(
             self.sample_platform_id, self.sample_platform)
 
         # ask for list of platforms in JSON
@@ -252,7 +250,7 @@ class TestRestApi(unittest.TestCase):
 
     def test_sensor_create(self):
         # put a platform...
-        Config.system.create_platform(
+        self.app.system.create_platform(
             self.sample_platform_id, self.sample_platform)
 
         # put a sensor
@@ -265,9 +263,9 @@ class TestRestApi(unittest.TestCase):
         make a platform using api, then put identical one using REST and ensure
         it fails
         """
-        Config.system.create_platform(
+        self.app.system.create_platform(
             self.sample_platform_id, self.sample_platform)
-        Config.system.create_sensor(
+        self.app.system.create_sensor(
             self.sample_platform_id, self.sample_sensor_id, self.sample_sensor)
         resp = self.client.post('/platforms/' +
                 self.sample_platform_id + "/" + self.sample_sensor_id,
@@ -282,9 +280,9 @@ class TestRestApi(unittest.TestCase):
 
     def test_sensor_read_item(self):
         # put platform and sensor...
-        Config.system.create_platform(
+        self.app.system.create_platform(
             self.sample_platform_id, self.sample_platform)
-        Config.system.create_sensor(
+        self.app.system.create_sensor(
             self.sample_platform_id, self.sample_sensor_id, self.sample_sensor)
 
         resp = self.client.get('/platforms/' +
@@ -301,9 +299,9 @@ class TestRestApi(unittest.TestCase):
 
     def test_sensor_delete(self):
         # register a platform and sensor
-        Config.system.create_platform(
+        self.app.system.create_platform(
             self.sample_platform_id, self.sample_platform)
-        Config.system.create_sensor(
+        self.app.system.create_sensor(
             self.sample_platform_id, self.sample_sensor_id, self.sample_sensor)
 
         # delete it
@@ -334,14 +332,14 @@ class TestRestApi(unittest.TestCase):
         make a parameter using api, then put identical one using REST and
         ensure it fails
         """
-        Config.system.create_parameter(
+        self.app.system.create_parameter(
             self.sample_parameter_id, self.sample_parameter)
         resp = self.client.post('/parameters/' + self.sample_parameter_id,
                 data=self.sample_parameter)
         self.assertEquals(status.CONFLICT, resp.status_code)
 
     def test_parameter_read_list(self):
-        Config.system.create_parameter(
+        self.app.system.create_parameter(
             self.sample_parameter_id, self.sample_parameter)
         resp = self.client.get('/parameters/',
                 headers={'Accept': 'application/json'})
@@ -351,7 +349,7 @@ class TestRestApi(unittest.TestCase):
         self.assertTrue(self.sample_parameter_id in json_data)
 
     def test_parameter_read_item(self):
-        Config.system.create_parameter(
+        self.app.system.create_parameter(
             self.sample_parameter_id, self.sample_parameter)
         resp = self.client.get('/parameters/' + self.sample_parameter_id,
                 headers={'Accept': 'application/json'})
@@ -362,7 +360,7 @@ class TestRestApi(unittest.TestCase):
         self.assertEquals(0, cmp(self.sample_parameter, json_data))
 
     def test_parameter_delete(self):
-        Config.system.create_parameter(
+        self.app.system.create_parameter(
             self.sample_parameter_id, self.sample_parameter)
 
         # test delete succeeds

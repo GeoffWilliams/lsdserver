@@ -24,9 +24,9 @@ from flask import Flask, render_template
 from lsdserver.platforms import platforms
 from lsdserver.parameters import parameters
 from lsdserver.ui import ui
-from lsdserver.config import Config
 from lsdserver import status
-
+from flask.ext.sqlalchemy import SQLAlchemy
+from lsdserver.backend import mysql
 
 def load_config(app, name, app_dir):
     """
@@ -34,10 +34,12 @@ def load_config(app, name, app_dir):
     """
     app.debug = True
     config_file = name + ".cfg"
-    
+    app.logger.info("app_name:%s; app_dir:%s;" % (name, app_dir))
+
     # /etc/NAME.cfg
     etc_config_file = "/etc/" + config_file
     rel_config_file = app_dir + "/" + config_file
+
     if os.path.isfile(etc_config_file):
         f = etc_config_file
     elif os.path.isfile(rel_config_file):
@@ -48,10 +50,10 @@ def load_config(app, name, app_dir):
 
     if f:
         app.logger.info("config file: %s" % f)
-        app.config.from_pyfile(f)        
+        app.config.from_pyfile(f)
 
-        if app.config.logdir:
-            logfile = app.config.logdir + "lsdserver.log"
+        if app.config["LOGDIR"]:
+            logfile = app.config["LOGDIR"] + "/lsdserver.log"
             app.logger.info("logging to %s" % logfile)
             file_handler = logging.FileHandler(logfile)
             file_handler.setLevel(logging.DEBUG)
@@ -64,11 +66,17 @@ def create_app(app_dir):
     app.register_blueprint(platforms, url_prefix='/platforms')
     app.register_blueprint(parameters, url_prefix='/parameters')
     app.register_blueprint(ui, url_prefix="")
-    app.system = Config.system
+
+    # database
+    app.system = mysql.Mysql()
+    app.db = SQLAlchemy(app)
+    app.system.session = app.db.session
+
     # general stuff - error pages etc
     app.errorhandler(404)(not_found_error)
     app.errorhandler(408)(conflict_error)
     app.errorhandler(500)(internal_error)
+
     return app
 
 
@@ -81,7 +89,7 @@ def conflict_error(error):
 
 
 def internal_error(error):
-    db.session.rollback()
+    #app.db.session.rollback()
     return render_template('500.html'), status.SERVER_ERROR
 
 

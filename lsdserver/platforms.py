@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from flask import Blueprint, render_template, abort, request, current_app
 from jinja2 import TemplateNotFound
-from lsdserver.config import Config
 from lsdserver import status
 import flask
 
@@ -27,11 +26,12 @@ platforms = Blueprint('platforms', __name__,
 
 
 def want_json():
-    current_app.logger.debug(
-        "request.accept_mimetypes: " + str(request.accept_mimetypes))
-    json = 'application/json' in request.accept_mimetypes
-    current_app.logger.debug("use json: " + str(json))
-    return json
+    best = request.accept_mimetypes \
+        .best_match(['application/json', 'text/html'])
+    return best == 'application/json' and \
+        request.accept_mimetypes[best] > \
+        request.accept_mimetypes['text/html']
+
 
 @platforms.route('/', methods=['GET'])
 def get_platform_list():
@@ -39,13 +39,16 @@ def get_platform_list():
     Get the list of platforms
     """
     current_app.logger.debug("get_platform_list()")
-    data = Config.system.get_platforms()
-    if want_json():
-        payload = flask.jsonify(data)
+    data = current_app.system.get_platforms()
+    if data:
+        if want_json():
+            payload = flask.jsonify(data)
+        else:
+            payload = render_template('platforms.html', data=data)
+
+        current_app.logger.debug('payload: ' + str(payload))
     else:
-        payload = render_template('platforms.html',
-            platform_id=platform_id, data=data)
-    current_app.logger.debug('payload: ' + str(payload))
+        payload = "no data returned FIXME"
     return payload, status.OK
 
 
@@ -55,7 +58,7 @@ def get_platform(platform_id):
     Get a specific platform
     """
     current_app.logger.debug("get(%s)" % platform_id)
-    data = Config.system.get_platform(platform_id)
+    data = current_app.system.get_platform(platform_id)
     if want_json():
         payload = flask.jsonify(data)
     else:
@@ -67,20 +70,20 @@ def get_platform(platform_id):
 
 @platforms.route('/<platform_id>', methods=['POST'])
 def create(platform_id):
-    Config.system.create_platform(platform_id, flask.request.get_data())
+    current_app.system.create_platform(platform_id, flask.request.get_data())
     return render_template('platform.html'), status.CREATED
 
 
 @platforms.route('/<platform_id>', methods=['DELETE'])
 def delete(platform_id):
-    Config.system.delete_platform(platform_id)
+    current_app.system.delete_platform(platform_id)
     return render_template('platform.html'), status.OK
 
 
 @platforms.route('/<platform_id>/<sensor_id>', methods=['GET'])
 def get_sensor(platform_id, sensor_id):
     current_app.logger.debug("get_sensor(%s, %s)" % (platform_id, sensor_id))
-    data = Config.system.get_sensor(platform_id, sensor_id)
+    data = current_app.system.get_sensor(platform_id, sensor_id)
     if want_json():
         payload = flask.jsonify(data)
     else:
@@ -92,12 +95,12 @@ def get_sensor(platform_id, sensor_id):
 
 @platforms.route('/<platform_id>/<sensor_id>', methods=['POST'])
 def create_sensor(platform_id, sensor_id):
-    Config.system.create_sensor(
+    current_app.system.create_sensor(
         platform_id, sensor_id, flask.request.get_data())
     return render_template('sensor.html'), status.CREATED
 
 
 @platforms.route('/<platform_id>/<sensor_id>', methods=['DELETE'])
 def delete_sensor(platform_id, sensor_id):
-    Config.system.delete_sensor(platform_id, sensor_id)
+    current_app.system.delete_sensor(platform_id, sensor_id)
     return render_template('sensor.html'), status.OK

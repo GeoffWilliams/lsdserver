@@ -38,7 +38,7 @@ class Mysql(LsdBackend):
         pass
 
     def get_platforms(self):
-        pass
+        return self.session.query(Platform).all()
 
     def create_platform(self, platform_id, data):
         pass

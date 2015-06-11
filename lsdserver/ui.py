@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from flask import Blueprint, render_template, abort, request, current_app
 from jinja2 import TemplateNotFound
-from lsdserver.config import Config
 from lsdserver import status
 import flask
 
