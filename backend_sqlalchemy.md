@@ -61,10 +61,10 @@ Imagine you had built a couple of DIY weather stations and them at a couple of s
 
 | platform_id (PK) | sensor_manufacturer (PK) | sensor_model (PK) | serial_number (PK) | phenomena (PK) | observation_table (AI) |
 |----------------- | ------------------------ | ----------------- | ------------------ | -------------- | ---------------------- |
-| coogee_0 | TI | HDC1000 | 13252030.f |  http://lsdserver.com/phenomena/temperature | 1 |
-| coogee_0 | TI | HDC1000 | 13252030.f | http://lsdserver.com/phenomena/humidity | 2 |
-| canberra_0 | TI | HDC1000 | 13262024.f|  http://lsdserver.com/phenomena/temperature | 3 |
-| canberra_0 | TI | HDC1000 | 13262024.f| http://lsdserver.com/phenomena/humidity | 4 |
+| coogee | TI | HDC1000 | 13252030.f |  http://lsdserver.com/phenomena/temperature | 1 |
+| coogee | TI | HDC1000 | 13252030.f | http://lsdserver.com/phenomena/humidity | 2 |
+| canberra | TI | HDC1000 | 13262024.f|  http://lsdserver.com/phenomena/temperature | 3 |
+| canberra | TI | HDC1000 | 13262024.f| http://lsdserver.com/phenomena/humidity | 4 |
 
 * The full table name for observations is obtained by prepending "o_" to the observation_table field
 
