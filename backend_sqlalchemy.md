@@ -39,29 +39,28 @@ Imagine you had built a couple of DIY weather stations and them at a couple of s
 (AI) = Auto increment
 ### platform
 
-|id (PK)|name|description|info|position| mobile |
-|------------------------|
-|coogee| coogee weather station|homemade weather station|/data/coogee| POINT(151.25525 -33.91837) | false |
-|canberra | canberra weather station | homemade weather station | http://... | POINT(149.12868 -35.28200) | false
+| id (PK) | name | description | info | position | mobile |
+| ------- | ---- | ----------- | ---- | -------- | ------ |
+| coogee | coogee weather station | homemade weather station | http://... | POINT(151.25525 -33.91837) | false |
+| canberra | canberra weather station | homemade weather station | http://... | POINT(149.12868 -35.28200) | false |
 
-* info field contains link to website or a hosted local file (/data...)
+* info field contains link to web page (see API)
 * name and description are optional and can be used to embed small notes
-*
 * position column uses spatial datatype _point_
 
 ### sensor
 
-|manufacturer (PK) |model (PK) | serial number (PK)| platform_id (PK)|  description | info |
-|---------------------------------------------|
-|TI | HDC1000 | 13252030.f | coogee | TI temp & humidity | http://www.ti.com/lit/gpn/hdc1000 |
-|TI | HDC1000 | 13262024.f|  canberra | TI temp & humidity | http://www.ti.com/lit/gpn/hdc1000 |
+| manufacturer (PK) | model (PK) | serial number (PK) | platform_id (PK) | description | info |
+| ----------------- | ---------- | ------------------ | ---------------- | ----------- | ---- |
+| TI | HDC1000 | 13252030.f | coogee | TI temp & humidity | http://www.ti.com/lit/gpn/hdc1000 |
+| TI | HDC1000 | 13262024.f|  canberra | TI temp & humidity | http://www.ti.com/lit/gpn/hdc1000 |
 
 * info field contains link to website or a hosted local file (/data...), typically this will be a datasheet for sensors
 
 ### parameter
 
-| platform_id (PK)| sensor_manufacturer (PK) | sensor_model (PK)| serial_number (PK) |  phenomena (PK)| observation_table (AI)|
-|-------------------------------------------|
+| platform_id (PK) | sensor_manufacturer (PK) | sensor_model (PK) | serial_number (PK) | phenomena (PK) | observation_table (AI) |
+|----------------- | ------------------------ | ----------------- | ------------------ | -------------- | ---------------------- |
 | coogee_0 | TI | HDC1000 | 13252030.f |  http://lsdserver.com/phenomena/temperature | 1 |
 | coogee_0 | TI | HDC1000 | 13252030.f | http://lsdserver.com/phenomena/humidity | 2 |
 | canberra_0 | TI | HDC1000 | 13262024.f|  http://lsdserver.com/phenomena/temperature | 3 |
@@ -80,7 +79,7 @@ Such a table could be created through a view if required.
 Observations table
 
 | timestamp (PK) | value |
-|-----|
+| -------------- | ----- |
 | 1434268755 | 112.8 |
 | 1434268755 | 23.1 |
 | 1434268755 | 24.1 |
@@ -92,13 +91,13 @@ Observations table
 Observation flags table.  This table links quality control flags back to specific observation records.  They can be inserted automatically by the system or manually by the the user making a REST request
 
 | timestamp (PK) | flag (PK) |
-|----|
+| -------------- | --------- |
 | 1434268755 | http://lsdserver.com/flags/implausable |
 
 ### user_phenomena
 
 | term (PK) | data_type | min_valid | max_valid | uom | description |
-|---|
+| --------- | --------- | --------- | --------- | --- | ----------- |
 | http://vocab.nerc.ac.uk/collection/P02/current/ALKY/ | double | pH | 6.0d | 9.0d | Alkalinity, acidity and pH of the water column |
 
 * Example of how a custom phenomena would be stored
@@ -109,7 +108,7 @@ Observation flags table.  This table links quality control flags back to specifi
 ### user_flag
 
 | term (PK) | info |
-|---|
+|---------- | ---- |
 | http://vocab.nerc.ac.uk/collection/B06/current/xCsrformTimesValid/ | null |
 | mark | data marked for removal |
 
