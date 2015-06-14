@@ -46,27 +46,26 @@ Imagine you had built a couple of DIY weather stations and them at a couple of s
 
 * info field contains link to website or a hosted local file (/data...)
 * name and description are optional and can be used to embed small notes
-* complex platform metadata should be stored outside of LSDServer, there are specialist systems available to do this such as [GeoNetwork](http://geonetwork-opensource.org/)
-* You could even have whole web pages setup and use the info field to redirect to a [full website](  https://www1.data.antarctica.gov.au/aadc/gaz/display_name.cfm?gaz_id=2496)
+*
 * position column uses spatial datatype _point_
 
 ### sensor
 
-|model (PK) | serial number (PK)| platform_id (PK)|  description | info |
+|manufacturer (PK) |model (PK) | serial number (PK)| platform_id (PK)|  description | info |
 |---------------------------------------------|
-|HDC1000 | 13252030.f | coogee | TI temp & humidity | http://www.ti.com/lit/gpn/hdc1000 |
-|HDC1000 | 13262024.f|  canberra | TI temp & humidity | http://www.ti.com/lit/gpn/hdc1000 |
+|TI | HDC1000 | 13252030.f | coogee | TI temp & humidity | http://www.ti.com/lit/gpn/hdc1000 |
+|TI | HDC1000 | 13262024.f|  canberra | TI temp & humidity | http://www.ti.com/lit/gpn/hdc1000 |
 
 * info field contains link to website or a hosted local file (/data...), typically this will be a datasheet for sensors
 
 ### parameter
 
-| platform_id (PK)| sensor_model (PK)| serial_number (PK) |  phenomena (PK)| observation_table (AI)|
+| platform_id (PK)| sensor_manufacturer (PK) | sensor_model (PK)| serial_number (PK) |  phenomena (PK)| observation_table (AI)|
 |-------------------------------------------|
-| coogee_0 | HDC1000 | 13252030.f |  http://lsdserver.com/phenomena/temperature | 1 |
-| coogee_0 | HDC1000 | 13252030.f | http://lsdserver.com/phenomena/humidity | 2 |
-| canberra_0 | HDC1000 | 13262024.f|  http://lsdserver.com/phenomena/temperature | 3 |
-| canberra_0 | HDC1000 | 13262024.f| http://lsdserver.com/phenomena/humidity | 4 |
+| coogee_0 | TI | HDC1000 | 13252030.f |  http://lsdserver.com/phenomena/temperature | 1 |
+| coogee_0 | TI | HDC1000 | 13252030.f | http://lsdserver.com/phenomena/humidity | 2 |
+| canberra_0 | TI | HDC1000 | 13262024.f|  http://lsdserver.com/phenomena/temperature | 3 |
+| canberra_0 | TI | HDC1000 | 13262024.f| http://lsdserver.com/phenomena/humidity | 4 |
 
 * The full table name for observations is obtained by prepending "o_" to the observation_table field
 
@@ -98,20 +97,21 @@ Observation flags table.  This table links quality control flags back to specifi
 
 ### user_phenomena
 
-| id (PK) (AI) | column_type | min_valid | max_valid | uom | description | info |
+| term (PK) | data_type | min_valid | max_valid | uom | description |
 |---|
-| 1 | double | pH | 6.0d | 9.0d | Alkalinity, acidity and pH of the water column | http://vocab.nerc.ac.uk/collection/P02/current/ALKY/
+| http://vocab.nerc.ac.uk/collection/P02/current/ALKY/ | double | pH | 6.0d | 9.0d | Alkalinity, acidity and pH of the water column |
 
 * Example of how a custom phenomena would be stored
 * pH scale ranges from 0-14 but seawater typically [ranges from 7.5 to 8.4](https://en.wikipedia.org/wiki/Seawater)
 * Measurements outside this range can be automatically flagged as being in error (_TODO_)
-* The phenomena needs to be registered with LSD Server before it is usable so that the column type can be set correctly in the observations table
+* The phenomena needs to be registered with LSD Server before it is usable so that the data type can be set correctly in the observations table
 
 ### user_flag
 
-| id (PK) (AI)| info |
+| term (PK) | info |
 |---|
-| 0 | http://vocab.nerc.ac.uk/collection/B06/current/xCsrformTimesValid/ |
+| http://vocab.nerc.ac.uk/collection/B06/current/xCsrformTimesValid/ | null |
+| mark | data marked for removal |
 
 * Example of how a custom user flag would be stored
 * No special handling is required for flags, they're simply associated with an observation record and data consumers can then use them as they please
