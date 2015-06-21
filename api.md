@@ -31,7 +31,7 @@ The following fields are available (identifier is encoded into the URL):
 * name (string)
 * description (string)
 * info (string, a relative or absolute URL)
-* position (fixed location _point_ for this platform, [WKT](https://en.wikipedia.org/wiki/Well-known_text) used as transport format)
+* location (fixed location _point_ for this platform, [WKT](https://en.wikipedia.org/wiki/Well-known_text) used as transport format)
 * mobile (false - not *currently supported*)
 
 ## JSON transport format
@@ -41,7 +41,7 @@ The following fields are available (identifier is encoded into the URL):
   "name": "platform_name",
   "description": "platform_description",
   "info": "http://link_for_more_info",
-  "position": "POINT(0,0)"
+  "location": "POINT(0,0)"
 }
 ```
 

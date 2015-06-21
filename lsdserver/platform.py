@@ -16,12 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-from flask import Blueprint, render_template, abort, request, current_app
+from flask import Blueprint, render_template, abort, request, current_app, redirect
 from jinja2 import TemplateNotFound
 from lsdserver import status
 import flask
 
-platforms = Blueprint('platforms', __name__,
+platform = Blueprint('platform', __name__,
                         template_folder='templates')
 
 
@@ -33,7 +33,7 @@ def want_json():
         request.accept_mimetypes['text/html']
 
 
-@platforms.route('/', methods=['GET'])
+@platform.route('/', methods=['GET'])
 def get_platform_list():
     """
     Get the list of platforms
@@ -52,7 +52,7 @@ def get_platform_list():
     return payload, status.OK
 
 
-@platforms.route('/<platform_id>', methods=['GET'])
+@platform.route('/<platform_id>', methods=['GET'])
 def get_platform(platform_id):
     """
     Get a specific platform
@@ -68,39 +68,98 @@ def get_platform(platform_id):
     return payload, status.OK
 
 
-@platforms.route('/<platform_id>', methods=['POST'])
+@platform.route('/<platform_id>', methods=['PUT'])
 def create(platform_id):
-    current_app.system.create_platform(platform_id, flask.request.get_data())
-    return render_template('platform.html'), status.CREATED
+    json = request.get_json()
+
+    print "*****************************"
+    import pprint
+    pprint.pprint(json)
+    result = None
+    if json:
+        # platform_id in URI overrides any platform URI present in json
+        json["platform_id"] = platform_id
+        current_app.system.create_platform(json)
+        result = status.CREATED
+    else:
+        result = status.BAD_REQUEST
+    return render_template('platform.html'), result
 
 
-@platforms.route('/<platform_id>', methods=['DELETE'])
+@platform.route('/<platform_id>', methods=['DELETE'])
 def delete(platform_id):
     current_app.system.delete_platform(platform_id)
     return render_template('platform.html'), status.OK
 
 
-@platforms.route('/<platform_id>/<sensor_id>', methods=['GET'])
-def get_sensor(platform_id, sensor_id):
-    current_app.logger.debug("get_sensor(%s, %s)" % (platform_id, sensor_id))
-    data = current_app.system.get_sensor(platform_id, sensor_id)
-    if want_json():
-        payload = flask.jsonify(data)
+@platform.route('/<platform_id>/info', methods=['GET'])
+def get_info(platform_id):
+    data = current_app.system.get_platform(platform_id)
+    if data["info"]:
+        return redirect(data["info"])
     else:
-        payload = render_template('sensor.html',
-            platform_id=platform_id, sensor_id=sensor_id, data=data)
-    current_app.logger.debug('payload: ' + str(payload))
-    return payload, status.OK
+        abort(status.NOT_FOUND)
 
 
-@platforms.route('/<platform_id>/<sensor_id>', methods=['POST'])
-def create_sensor(platform_id, sensor_id):
-    current_app.system.create_sensor(
-        platform_id, sensor_id, flask.request.get_data())
-    return render_template('sensor.html'), status.CREATED
+@platform.route('/<platform_id>/info', methods=['PUT'])
+def put_info(platform_id):
+    data = current_app.system.get_platform(platform_id)
+    request_data = request.get_data()
+    result = None
+    message = None
+    if data:
+        if request_data:
+            data["info"] = request_data
+            current_app.system.update_platform(data)
+            result = status.CREATED
+            message = "OK"
+        else:
+            result = status.BAD_REQUEST
+            message = "ERROR"
+    else:
+        message = "MISSING"
+        result = status.NOT_FOUND
+    return message, result
 
 
-@platforms.route('/<platform_id>/<sensor_id>', methods=['DELETE'])
-def delete_sensor(platform_id, sensor_id):
-    current_app.system.delete_sensor(platform_id, sensor_id)
-    return render_template('sensor.html'), status.OK
+@platform.route('/<platform_id>/info', methods=['DELETE'])
+def delete_info(platform_id):
+    data = current_app.system.get_platform(platform_id)
+    data["info"] = None
+    current_app.system.update_platform(data)
+    return "OK", status.NO_CONTENT
+
+
+@platform.route('/<platform_id>/location', methods=['GET'])
+def get_location(platform_id):
+    data = current_app.system.get_platform(platform_id)
+    if data and data["location"]:
+        return data["location"]
+    else:
+        abort(status.NOT_FOUND)
+
+#@platform.route('/<platform_id>/<sensor_id>', methods=['GET'])
+#def get_sensor(platform_id, sensor_id):
+    #current_app.logger.debug("get_sensor(%s, %s)" % (platform_id, sensor_id))
+    #data = current_app.system.get_sensor(platform_id, sensor_id)
+    #if want_json():
+        #payload = flask.jsonify(data)
+    #else:
+        #payload = render_template('sensor.html',
+            #platform_id=platform_id, sensor_id=sensor_id, data=data)
+    #current_app.logger.debug('payload: ' + str(payload))
+    #return payload, status.OK
+
+#
+#@platform.route('/<platform_id>/<sensor_id>', methods=['POST'])
+#def create_sensor(platform_id, sensor_id):
+    #current_app.system.create_sensor(
+        #platform_id, sensor_id, flask.request.get_data())
+    #return render_template('sensor.html'), status.CREATED
+
+##
+#@platform.route('/<platform_id>/<sensor_id>', methods=['DELETE'])
+#def delete_sensor(platform_id, sensor_id):
+    #current_app.system.delete_sensor(platform_id, sensor_id)
+    #return render_template('sensor.html'), status.OK
+#

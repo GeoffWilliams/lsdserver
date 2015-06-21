@@ -21,7 +21,7 @@ from jinja2 import TemplateNotFound
 from lsdserver import status
 import flask
 
-parameters = Blueprint('parameters', __name__,
+parameter = Blueprint('parameter', __name__,
                         template_folder='templates')
 
 
@@ -32,7 +32,7 @@ def want_json():
     return 'application/json' in request.accept_mimetypes
 
 
-@parameters.route('/', methods=['GET'])
+@parameter.route('/', methods=['GET'])
 def get_parameter_list():
     """
     Get the list of platforms
@@ -47,7 +47,7 @@ def get_parameter_list():
     return payload, status.OK
 
 
-@parameters.route('/<parameter_id>', methods=['GET'])
+@parameter.route('/<parameter_id>', methods=['GET'])
 def get_parameter_item(parameter_id):
     """
     Get the list of platforms
@@ -62,7 +62,7 @@ def get_parameter_item(parameter_id):
     return payload, status.OK
 
 
-@parameters.route('/<parameter_id>', methods=['DELETE'])
+@parameter.route('/<parameter_id>', methods=['DELETE'])
 def delete_parameter(parameter_id):
     """
     Get the list of platforms
@@ -77,7 +77,7 @@ def delete_parameter(parameter_id):
     return payload, status.OK
 
 
-@parameters.route('/<parameter_id>', methods=['POST'])
+@parameter.route('/<parameter_id>', methods=['POST'])
 def create_parameter(parameter_id):
     """
     Get the list of platforms

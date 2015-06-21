@@ -42,6 +42,7 @@ class Parameter(Base):
 class Sensor(Base):
     __tablename__ = 'sensor'
     id = Column(Integer, primary_key=True)
+    platform_id = Column(Integer, ForeignKey("platform.id"), nullable=False)
     manufacturer = Column(String(100))
     model = Column(String(100))
     serial_number = Column(String(100))
@@ -81,16 +82,20 @@ class LsdBackend(object):
         pass
 
     @abstractmethod
+    def get_platforms(self, limit, offset):
+        pass
+
+    @abstractmethod
+    def create_platform(self, data):
+        pass
+
+    def update_platform(self, data):
+        pass
+
+
     def get_sensor(self, platform_id, sensor_id):
         pass
 
-    @abstractmethod
-    def get_platforms(self):
-        pass
-
-    @abstractmethod
-    def create_platform(self, platform_id, data):
-        pass
 
     @abstractmethod
     def create_sensor(self, platform_id, sensor_id, data):

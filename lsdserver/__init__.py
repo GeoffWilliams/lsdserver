@@ -21,12 +21,15 @@
 import logging
 import os
 from flask import Flask, render_template
-from lsdserver.platforms import platforms
-from lsdserver.parameters import parameters
+from lsdserver.platform import platform
+from lsdserver.parameter import parameter
+from lsdserver.version import version
 from lsdserver.ui import ui
 from lsdserver import status
 from flask.ext.sqlalchemy import SQLAlchemy
 from lsdserver.backend import mysql
+
+# https://pythonhosted.org/Flask-Uploads/
 
 def load_config(app, name, app_dir):
     """
@@ -45,8 +48,8 @@ def load_config(app, name, app_dir):
     elif os.path.isfile(rel_config_file):
         f = rel_config_file
     else:
-        f = None
-        app.logger.error("No %s found!" % config_file)
+        f = False
+        app.logger.warn("No %s found!" % config_file)
 
     if f:
         app.logger.info("config file: %s" % f)
@@ -63,8 +66,9 @@ def create_app(app_dir):
     app = Flask(__name__)
     load_config(app, __name__, app_dir)
 
-    app.register_blueprint(platforms, url_prefix='/platforms')
-    app.register_blueprint(parameters, url_prefix='/parameters')
+    app.register_blueprint(version, url_prefix='/version')
+    app.register_blueprint(platform, url_prefix='/platform')
+    app.register_blueprint(parameter, url_prefix='/parameter')
     app.register_blueprint(ui, url_prefix="")
 
     # database
