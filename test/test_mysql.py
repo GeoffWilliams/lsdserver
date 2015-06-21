@@ -159,22 +159,22 @@ class TestMysql(unittest.TestCase):
     #
     # get_sensor()
     #
-    def test_get_sensor_no_data(self):
-        """ get_sensor() with no data loaded """
-        data = self.backend.get_sensor("abc")
-        self.assertEqual(len(data), 0)
+#    def test_get_sensor_no_data(self):
+#        """ get_sensor() with no data loaded """
+#        data = self.backend.get_sensor("abc")
+#        self.assertEqual(len(data), 0)
 
-    def test_get_sensor_data(self):
-        """ get_sensor() with data loaded"""
-        sensor = self.demo_sensor()
-        data = self.backend.get_sensor(sensor.id)
-        self.assertTrue(data)
-        self.assertEqual(data.id, sensor.id)
-        self.assertEqual(data.manufacturer, sensor.manufacturer)
-        self.assertEqual(data.model, sensor.model)
-        self.assertEqual(data.serial_number, sensor.serial_number)
-        self.assertEqual(data.name, sensor.name)
-        self.assertEqual(data.description, sensor.description)
+#    def test_get_sensor_data(self):
+#        """ get_sensor() with data loaded"""
+#        sensor = self.demo_sensor()
+#        data = self.backend.get_sensor(sensor.id)
+#        self.assertTrue(data)
+#        self.assertEqual(data.id, sensor.id)
+#        self.assertEqual(data.manufacturer, sensor.manufacturer)
+#        self.assertEqual(data.model, sensor.model)
+#        self.assertEqual(data.serial_number, sensor.serial_number)
+#        self.assertEqual(data.name, sensor.name)
+#       self.assertEqual(data.description, sensor.description)
     #
     # create_platform()
     #

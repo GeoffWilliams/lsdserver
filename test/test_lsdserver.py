@@ -19,7 +19,6 @@
 import sys
 import os
 APP_DIR = os.path.dirname(os.path.realpath(__file__)) + "/.."
-print("*** " + APP_DIR)
 sys.path.append(APP_DIR)
 import unittest
 import lsdserver

@@ -1,3 +1,9 @@
+import unittest
+import sys
+import os
+APP_DIR = os.path.dirname(os.path.realpath(__file__)) + "/.."
+sys.path.append(APP_DIR)
+from lsdserver.validator import Validator
 
 class TestValidator(unittest.TestCase):
     """
