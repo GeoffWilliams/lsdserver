@@ -78,6 +78,16 @@ class MockSystem(object):
         #        self.sensors[sensor_id] = data
         #else:
 
+    def update_sensor(self, data):
+        """replace whole sensor"""
+        try:
+            self.sensors[data["platform_id"]]\
+                        [data["manufacturer"]]\
+                        [data["model"]]\
+                        [data["serial_number"]] = data
+        except KeyError:
+            flask.abort(status.NOT_FOUND)
+
     def delete_platform(self, platform_id):
         if platform_id in self.platforms:
             del self.platforms[platform_id]

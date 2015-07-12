@@ -19,7 +19,7 @@
 
 import json
 #from lsdserver import app
-#app.logger.debug("**** inside view.py ****")
+
 from flask import render_template, current_app
 from lsdserver import status
 from lsdserver.config import system

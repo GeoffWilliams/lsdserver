@@ -27,10 +27,6 @@ sensor = Blueprint('sensor', __name__,
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>', methods=['PUT'])
 def create(platform_id, manufacturer, model, serial_number):
     json = request.get_json()
-
-    print "*****************************"
-    import pprint
-    pprint.pprint(json)
     result = None
     if json:
         # platform_id in URI overrides any platform URI present in json
@@ -43,6 +39,36 @@ def create(platform_id, manufacturer, model, serial_number):
     else:
         result = status.BAD_REQUEST
     return render_template('platform.html'), result
+
+
+
+@sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>/info', methods=['GET'])
+def get_info(platform_id, manufacturer, model, serial_number):
+    data = current_app.system.get_sensor(platform_id, manufacturer, model, serial_number)
+    if data["info"]:
+        return redirect(data["info"])
+    else:
+        abort(status.NOT_FOUND)
+
+@sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>/info', methods=['PUT'])
+def put_info(platform_id, manufacturer, model, serial_number):
+    data = current_app.system.get_sensor(platform_id, manufacturer, model, serial_number)
+    request_data = request.get_data()
+    result = None
+    message = None
+    if data:
+        if request_data:
+            data["info"] = request_data
+            current_app.system.update_sensor(data)
+            result = status.CREATED
+            message = "OK"
+        else:
+            result = status.BAD_REQUEST
+            message = "ERROR"
+    else:
+        message = "MISSING"
+        result = status.NOT_FOUND
+    return message, result
 
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>', methods=['GET'])
 def get(platform_id, manufacturer, model, serial_number):

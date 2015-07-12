@@ -36,6 +36,7 @@ from sample_data import SampleData
 from support import MockSystem
 
 
+
 LsdBackend.register(MockSystem)
 
 
@@ -375,10 +376,34 @@ class TestRestApi(unittest.TestCase):
     # /sensor/*/info
     """
     def test_sensor_info_read(self):
-        pass
+        """register a platform and sensor, then try to read the sensor info"""
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
 
-    def test_sensor_read_write(self):
-        pass
+        resp = self.client.get(
+            '/sensor/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number +
+            "/info")
+
+        self.assertEqual(SampleData.sample_sensor["info"], resp.location)
+        self.assertEqual(status.REDIRECT, resp.status_code)
+
+
+    def test_sensor_info_write(self):
+       # sample URL (will redirect)
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
+
+        resp = self.client.put(
+            '/sensor/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number +
+            "/info",
+            data=SampleData.sample_uri)
+        self.assertEqual(status.CREATED, resp.status_code)
 
     """
     #

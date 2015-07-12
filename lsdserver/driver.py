@@ -89,6 +89,7 @@ class LsdBackend(object):
     def create_platform(self, data):
         pass
 
+    @abstractmethod
     def update_platform(self, data):
         pass
 
@@ -107,6 +108,10 @@ class LsdBackend(object):
 
     @abstractmethod
     def delete_sensor(self, platform_id, manufacturer, model, serial_number):
+        pass
+
+    @abstractmethod
+    def update_sensor(self, data):
         pass
 
     @abstractmethod

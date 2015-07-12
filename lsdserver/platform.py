@@ -71,10 +71,6 @@ def get_platform(platform_id):
 @platform.route('/<platform_id>', methods=['PUT'])
 def create(platform_id):
     json = request.get_json()
-
-    print "*****************************"
-    import pprint
-    pprint.pprint(json)
     result = None
     if json:
         # platform_id in URI overrides any platform URI present in json

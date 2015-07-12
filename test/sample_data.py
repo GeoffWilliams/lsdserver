@@ -33,7 +33,7 @@ This is some sample info, it will be created as a file and read back
         "model": sample_sensor_model,
         "serial_number": sample_sensor_serial_number,
         "description": "sensor_description",
-        "info": "http://..."
+        "info": "http://sample_sensor_redirect"
     }
 
     """

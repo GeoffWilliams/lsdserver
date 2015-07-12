@@ -46,6 +46,12 @@ class Mysql(LsdBackend):
     def create_sensor(self, platform_id, sensor_id, data):
         pass
 
+    def update_platform(self, data):
+        pass
+
+    def update_sensor(self, data):
+        pass
+
     def delete_platform(self, platform_id):
         pass
 
