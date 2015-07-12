@@ -41,3 +41,13 @@ def get(term):
     data = current_app.system.get_phenomena(term)
     payload = flask.jsonify(data)
     return payload, status.OK
+
+
+@phenomena.route('/', methods=['GET'])
+def get_phenomena_list():
+    """
+    Get the list of platforms
+    """
+    data = current_app.system.get_phenomenas()
+    payload = Helper.get_list("phenomenas.html", request, data)
+    return payload, status.OK

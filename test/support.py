@@ -33,6 +33,33 @@ class MockSystem(LsdBackend):
             flask.abort(status.NOT_FOUND)
         return data
 
+    def get_sensors(self, platform_id=None, manufacturer=None, model=None):
+        matched = {}
+        for idx_platform_id in self.sensors:
+            if (platform_id and idx_platform_id == platform_id) or platform_id is None:
+                for idx_manufacturer in self.sensors[idx_platform_id]:
+                    if (manufacturer and idx_manufacturer == manufacturer) or manufacturer is None:
+                        for idx_model in self.sensors[idx_platform_id][idx_manufacturer]:
+                            if (idx_model in self.sensors[idx_platform_id][idx_manufacturer]) or model is None:
+                                for idx_serial_number in self.sensors[idx_platform_id][idx_manufacturer][idx_model]:
+                                    matched[idx_serial_number]=self.sensors[idx_platform_id][idx_manufacturer][idx_model][idx_serial_number]
+        return matched
+
+    def get_parameters(self, platform_id=None, manufacturer=None, model=None, serial_number=None):
+        matched = {}
+        for idx_platform_id in self.parameters:
+            if (platform_id and idx_platform_id == platform_id) or platform_id is None:
+                for idx_manufacturer in self.parameters[idx_platform_id]:
+                    if (manufacturer and idx_manufacturer == manufacturer) or manufacturer is None:
+                        for idx_model in self.parameters[idx_platform_id][idx_manufacturer]:
+                            if (idx_model in self.parameters[idx_platform_id][idx_manufacturer]) or model is None:
+                                for idx_serial_number in self.parameters[idx_platform_id][idx_manufacturer][idx_model]:
+                                    if (idx_serial_number in self.parameters[idx_platform_id][idx_manufacturer][idx_model]) or serial_number is None:
+                                        for idx_phenomena in self.parameters[idx_platform_id][idx_manufacturer][idx_model][idx_serial_number]:
+                                            matched[idx_phenomena]=self.parameters[idx_platform_id][idx_manufacturer][idx_model][idx_serial_number][idx_phenomena]
+
+        return matched
+
     def get_platforms(self):
         return self.platforms
 
@@ -168,9 +195,6 @@ class MockSystem(LsdBackend):
         except KeyError:
             flask.abort(status.NOT_FOUND)
 
-    def get_parameters(self):
-        return self.parameters
-
     def create_phenomena(self, data):
         if data["term"] in self.phenomena:
             flask.abort(status.CONFLICT)
@@ -182,6 +206,9 @@ class MockSystem(LsdBackend):
             return self.phenomena[term]
         except KeyError:
             flask.abort(status.NOT_FOUND)
+
+    def get_phenomenas(self):
+        return self.phenomena
 
     def delete_phenomena(self, term):
         try:
@@ -201,8 +228,13 @@ class MockSystem(LsdBackend):
         except KeyError:
             flask.abort(status.NOT_FOUND)
 
+    def get_flags(self):
+        return self.flags
+
     def delete_flag(self, term):
         try:
             del self.flags[term]
         except KeyError:
             flask.abort(status.NOT_FOUND)
+
+        

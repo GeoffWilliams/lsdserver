@@ -41,3 +41,13 @@ def get(term):
     data = current_app.system.get_flag(term)
     payload = flask.jsonify(data)
     return payload, status.OK
+
+
+@flag.route('/', methods=['GET'])
+def get_flag_list():
+    """
+    Get the list of platforms
+    """
+    data = current_app.system.get_flags()
+    payload = Helper.get_list("flags.html", request, data)
+    return payload, status.OK

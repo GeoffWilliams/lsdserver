@@ -56,7 +56,45 @@ def delete(platform_id, manufacturer, model, serial_number, phenomena):
     current_app.system.delete_parameter(
         platform_id, manufacturer, model, serial_number, phenomena)
     return "result", status.NO_CONTENT
+
+@parameter.route('/', methods=['GET'])
+def get_list():
+    data = current_app.system.get_parameters()
+    payload = Helper.get_list("parameters.html", request, data)
+    return payload, status.OK
+
+
+@parameter.route('/<platform_id>', methods=['GET'])
+def get_list_platform(platform_id):
+    data = current_app.system.get_parameters(platform_id)
+    payload = Helper.get_list("parameters.html", request, data)
+    return payload, status.OK
+
+
+@parameter.route('/<platform_id>/<manufacturer>', methods=['GET'])
+def get_list_platform_manufacturer(platform_id, manufacturer):
+    data = current_app.system.get_parameters(platform_id, manufacturer)
+    payload = Helper.get_list("parameters.html", request, data)
+    return payload, status.OK
+
+
+@parameter.route('/<platform_id>/<manufacturer>/<model>', methods=['GET'])
+def get_list_platform_manufacturer_model(platform_id, manufacturer, model):
+    data = current_app.system.get_parameters(platform_id, manufacturer, model)
+    payload = Helper.get_list("parameters.html", request, data)
+    return payload, status.OK
+
+
+@parameter.route('/<platform_id>/<manufacturer>/<model>/<serial_number>', methods=['GET'])
+def get_list_platform_manufacturer_model_serial_number(platform_id, manufacturer, model, serial_number):
+    data = current_app.system.get_parameters(platform_id, manufacturer, model, serial_number)
+    payload = Helper.get_list("parameters.html", request, data)
+    return payload, status.OK
+
 # ================================= old crud below========
+
+
+
 
 
 

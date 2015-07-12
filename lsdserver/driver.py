@@ -115,6 +115,10 @@ class LsdBackend(object):
         pass
 
     @abstractmethod
+    def get_sensors(self, platform_id=None, manufacturer=None, model=None):
+        pass
+
+    @abstractmethod
     def create_parameter(self, data):
         pass
 
@@ -125,6 +129,10 @@ class LsdBackend(object):
                       model,
                       serial_number,
                       phenomena):
+        pass
+
+    @abstractmethod
+    def get_parameters(self, platform_id=None, manufacturer=None, model=None, serial_number=None):
         pass
 
     @abstractmethod
@@ -149,6 +157,10 @@ class LsdBackend(object):
         pass
 
     @abstractmethod
+    def get_phenomenas(self):
+        pass
+
+    @abstractmethod
     def delete_phenomena(self, term):
         pass
 
@@ -158,6 +170,10 @@ class LsdBackend(object):
 
     @abstractmethod
     def get_flag(self, term):
+        pass
+
+    @abstractmethod
+    def get_flags(self):
         pass
 
     @abstractmethod

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, abort, current_app, redirect
 from lsdserver import status
+import flask
 
 class Helper():
 
@@ -53,3 +54,17 @@ class Helper():
             message = "ERROR"
 
         return message, result
+
+    @staticmethod
+    def get_list(template, request, data):
+        print("---->" + str(data))
+        if data:
+            if Helper.want_json(request):
+                payload = flask.jsonify(data)
+                print str(payload)
+            else:
+                payload = render_template(template, data=data)
+        else:
+            payload = "no data found"
+
+        return payload

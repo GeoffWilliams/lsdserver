@@ -88,4 +88,17 @@ class Mysql(LsdBackend):
     def delete_flag(self, term):
         pass
 
+    def get_sensors(self, platform_id=None, manufacturer=None, model=None):
+        pass
+
+    def get_parameters(self, platform_id=None, manufacturer=None, model=None, serial_number=None):
+        pass
+
+    def get_flags(self):
+        pass
+
+    def get_phenomenas(self):
+        pass
+
+
 LsdBackend.register(Mysql)

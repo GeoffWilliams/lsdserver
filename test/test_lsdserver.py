@@ -391,7 +391,6 @@ class TestRestApi(unittest.TestCase):
         self.assertEqual(SampleData.sample_sensor["info"], resp.location)
         self.assertEqual(status.REDIRECT, resp.status_code)
 
-
     def test_sensor_info_write(self):
        # sample URL (will redirect)
         self.app.system.create_platform(SampleData.sample_platform)
@@ -405,6 +404,48 @@ class TestRestApi(unittest.TestCase):
             "/info",
             data=SampleData.sample_uri)
         self.assertEqual(status.CREATED, resp.status_code)
+
+    def test_sensor_list(self):
+        """create a sensor, then list all sensors"""
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
+
+        # unfiltered
+        uri = '/sensor/'
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        self.assertEquals(status.OK, resp.status_code)
+        json_data = json.loads(resp.data)
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
+
+        # platform_id
+        uri += SampleData.sample_platform_id
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        json_data = json.loads(resp.data)
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
+
+        # manufacturer
+        uri += "/" + SampleData.sample_sensor_manufacturer
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        json_data = json.loads(resp.data)
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
+
+        # model
+        uri += "/" + SampleData.sample_sensor_model
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        json_data = json.loads(resp.data)
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
 
     """
     #
@@ -472,6 +513,65 @@ class TestRestApi(unittest.TestCase):
             urllib.quote_plus(SampleData.sample_parameter_phenomena))
         self.assertEqual(status.NOT_FOUND, resp.status_code)
 
+    def test_parameter_list(self):
+        """create a parameter, then list all parameters"""
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
+        self.app.system.create_parameter(SampleData.sample_parameter)
+
+        # unfiltered
+        uri = '/parameter/'
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        self.assertEquals(status.OK, resp.status_code)
+        json_data = json.loads(resp.data)
+
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        #self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
+        self.assertTrue(SampleData.sample_parameter_phenomena in json_data)
+
+        # platform_id
+        uri += SampleData.sample_platform_id
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        json_data = json.loads(resp.data)
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        #self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
+        self.assertTrue(SampleData.sample_parameter_phenomena in json_data)
+
+        # manufacturer
+        uri += "/" + SampleData.sample_sensor_manufacturer
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        json_data = json.loads(resp.data)
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        #self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
+        self.assertTrue(SampleData.sample_parameter_phenomena in json_data)
+
+        # model
+        uri += "/" + SampleData.sample_sensor_model
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        json_data = json.loads(resp.data)
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        #self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
+        self.assertTrue(SampleData.sample_parameter_phenomena in json_data)
+
+        # serial number
+        uri += "/" + SampleData.sample_sensor_serial_number
+        resp = self.client.get(uri, headers={'Accept': 'application/json'})
+        json_data = json.loads(resp.data)
+        #self.assertTrue(SampleData.sample_platform_id in json_data)
+        #self.assertTrue(SampleData.sample_sensor_manufacturer in json_data)
+        #self.assertTrue(SampleData.sample_sensor_model in json_data)
+        #self.assertTrue(SampleData.sample_sensor_serial_number in json_data)
+        self.assertTrue(SampleData.sample_parameter_phenomena in json_data)
+
+
     """
     # Delete
     """
@@ -509,7 +609,11 @@ class TestRestApi(unittest.TestCase):
 
     def test_list_phenomena(self):
         """list all phenomena"""
-        pass
+        self.app.system.create_phenomena(SampleData.sample_phenomena)
+        resp = self.client.get("/phenomena/", headers={'Accept': 'application/json'})
+        self.assertEquals(status.OK, resp.status_code)
+        json_data = json.loads(resp.data)
+        self.assertTrue(SampleData.sample_phenomena_term in json_data)
 
     """
     Create
@@ -576,7 +680,14 @@ class TestRestApi(unittest.TestCase):
     List
     """
     def test_list_flags(self):
-        pass
+        """list all flags"""
+        self.app.system.create_flag(SampleData.sample_flag)
+        resp = self.client.get("/flag/", headers={'Accept': 'application/json'})
+        self.assertEquals(status.OK, resp.status_code)
+        json_data = json.loads(resp.data)
+
+        print(json_data)
+        self.assertTrue(SampleData.sample_flag_term in json_data)
 
     """
     Create

@@ -51,6 +51,34 @@ def get(platform_id, manufacturer, model, serial_number):
     payload = flask.jsonify(data)
     return payload, status.OK
 
+@sensor.route('/', methods=['GET'])
+def get_list():
+    data = current_app.system.get_sensors()
+    payload = Helper.get_list("sensors.html", request, data)
+    return payload, status.OK
+
+
+@sensor.route('/<platform_id>', methods=['GET'])
+def get_list_platform(platform_id):
+    data = current_app.system.get_sensors(platform_id)
+    payload = Helper.get_list("sensors.html", request, data)
+    return payload, status.OK
+
+
+@sensor.route('/<platform_id>/<manufacturer>', methods=['GET'])
+def get_list_platform_manufacturer(platform_id, manufacturer):
+    data = current_app.system.get_sensors(platform_id, manufacturer)
+    payload = Helper.get_list("sensors.html", request, data)
+    return payload, status.OK
+
+
+@sensor.route('/<platform_id>/<manufacturer>/<model>', methods=['GET'])
+def get_list_platform_manufacturer_model(platform_id, manufacturer, model):
+    data = current_app.system.get_sensors(platform_id, manufacturer, model)
+    payload = Helper.get_list("sensors.html", request, data)
+    return payload, status.OK
+
+
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>', methods=['DELETE'])
 def delete(platform_id, manufacturer, model, serial_number):
     current_app.system.delete_sensor(platform_id, manufacturer, model, serial_number)

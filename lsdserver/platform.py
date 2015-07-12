@@ -33,15 +33,7 @@ def get_platform_list():
     """
     current_app.logger.debug("get_platform_list()")
     data = current_app.system.get_platforms()
-    if data:
-        if Helper.want_json(request):
-            payload = flask.jsonify(data)
-        else:
-            payload = render_template('platforms.html', data=data)
-
-        current_app.logger.debug('payload: ' + str(payload))
-    else:
-        payload = "no data returned FIXME"
+    payload = Helper.get_list("platforms.html", request, data)
     return payload, status.OK
 
 
