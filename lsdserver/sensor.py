@@ -19,56 +19,31 @@
 from flask import Blueprint, render_template, abort, request, current_app, redirect
 from jinja2 import TemplateNotFound
 from lsdserver import status
+from lsdserver.helper import Helper
 import flask
 
-sensor = Blueprint('sensor', __name__,
-                        template_folder='templates')
+sensor = Blueprint('sensor', __name__, template_folder='templates')
 
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>', methods=['PUT'])
 def create(platform_id, manufacturer, model, serial_number):
-    json = request.get_json()
-    result = None
-    if json:
-        # platform_id in URI overrides any platform URI present in json
-        json["platform_id"] = platform_id
-        json["manufacturer"] = manufacturer
-        json["model"] = model
-        json["serial_number"] = serial_number
-        current_app.system.create_sensor(json)
-        result = status.CREATED
-    else:
-        result = status.BAD_REQUEST
-    return render_template('platform.html'), result
-
+    return Helper.create(request, current_app.system.create_sensor, {
+        "platform_id": platform_id,
+        "manufacturer": manufacturer,
+        "model": model,
+        "serial_number": serial_number
+    })
 
 
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>/info', methods=['GET'])
 def get_info(platform_id, manufacturer, model, serial_number):
     data = current_app.system.get_sensor(platform_id, manufacturer, model, serial_number)
-    if data["info"]:
-        return redirect(data["info"])
-    else:
-        abort(status.NOT_FOUND)
+    return Helper.info_redirect(data)
 
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>/info', methods=['PUT'])
 def put_info(platform_id, manufacturer, model, serial_number):
     data = current_app.system.get_sensor(platform_id, manufacturer, model, serial_number)
-    request_data = request.get_data()
-    result = None
-    message = None
-    if data:
-        if request_data:
-            data["info"] = request_data
-            current_app.system.update_sensor(data)
-            result = status.CREATED
-            message = "OK"
-        else:
-            result = status.BAD_REQUEST
-            message = "ERROR"
-    else:
-        message = "MISSING"
-        result = status.NOT_FOUND
-    return message, result
+    update_function = current_app.system.update_sensor
+    return Helper.put_info(data, request, update_function)
 
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>', methods=['GET'])
 def get(platform_id, manufacturer, model, serial_number):
@@ -79,4 +54,4 @@ def get(platform_id, manufacturer, model, serial_number):
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>', methods=['DELETE'])
 def delete(platform_id, manufacturer, model, serial_number):
     current_app.system.delete_sensor(platform_id, manufacturer, model, serial_number)
-    return render_template('platform.html'), status.OK
+    return "result", status.OK

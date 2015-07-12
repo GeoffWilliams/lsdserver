@@ -17,20 +17,13 @@
 # along with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 from flask import Blueprint, render_template, abort, request, current_app, redirect
-from jinja2 import TemplateNotFound
 from lsdserver import status
+from lsdserver.helper import Helper
 import flask
 
-platform = Blueprint('platform', __name__,
-                        template_folder='templates')
+platform = Blueprint('platform', __name__, template_folder='templates')
 
 
-def want_json():
-    best = request.accept_mimetypes \
-        .best_match(['application/json', 'text/html'])
-    return best == 'application/json' and \
-        request.accept_mimetypes[best] > \
-        request.accept_mimetypes['text/html']
 
 
 @platform.route('/', methods=['GET'])
@@ -41,7 +34,7 @@ def get_platform_list():
     current_app.logger.debug("get_platform_list()")
     data = current_app.system.get_platforms()
     if data:
-        if want_json():
+        if Helper.want_json(request):
             payload = flask.jsonify(data)
         else:
             payload = render_template('platforms.html', data=data)
@@ -59,27 +52,19 @@ def get_platform(platform_id):
     """
     current_app.logger.debug("get(%s)" % platform_id)
     data = current_app.system.get_platform(platform_id)
-    if want_json():
+    if Helper.want_json(request):
         payload = flask.jsonify(data)
     else:
         payload = render_template('platform.html',
-            platform_id=platform_id, data=data)
+                                  platform_id=platform_id, data=data)
     current_app.logger.debug('payload: ' + str(payload))
     return payload, status.OK
 
 
 @platform.route('/<platform_id>', methods=['PUT'])
 def create(platform_id):
-    json = request.get_json()
-    result = None
-    if json:
-        # platform_id in URI overrides any platform URI present in json
-        json["platform_id"] = platform_id
-        current_app.system.create_platform(json)
-        result = status.CREATED
-    else:
-        result = status.BAD_REQUEST
-    return render_template('platform.html'), result
+    return Helper.create(request, current_app.system.create_platform,
+                         {"platform_id": platform_id})
 
 
 @platform.route('/<platform_id>', methods=['DELETE'])
@@ -91,31 +76,14 @@ def delete(platform_id):
 @platform.route('/<platform_id>/info', methods=['GET'])
 def get_info(platform_id):
     data = current_app.system.get_platform(platform_id)
-    if data["info"]:
-        return redirect(data["info"])
-    else:
-        abort(status.NOT_FOUND)
+    return Helper.info_redirect(data)
 
 
 @platform.route('/<platform_id>/info', methods=['PUT'])
 def put_info(platform_id):
     data = current_app.system.get_platform(platform_id)
-    request_data = request.get_data()
-    result = None
-    message = None
-    if data:
-        if request_data:
-            data["info"] = request_data
-            current_app.system.update_platform(data)
-            result = status.CREATED
-            message = "OK"
-        else:
-            result = status.BAD_REQUEST
-            message = "ERROR"
-    else:
-        message = "MISSING"
-        result = status.NOT_FOUND
-    return message, result
+    update_function = current_app.system.update_platform
+    return Helper.put_info(data, request, update_function)
 
 
 @platform.route('/<platform_id>/info', methods=['DELETE'])

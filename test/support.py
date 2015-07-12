@@ -81,10 +81,11 @@ class MockSystem(object):
     def update_sensor(self, data):
         """replace whole sensor"""
         try:
-            self.sensors[data["platform_id"]]\
-                        [data["manufacturer"]]\
-                        [data["model"]]\
-                        [data["serial_number"]] = data
+            self.sensors\
+                [data["platform_id"]]\
+                [data["manufacturer"]]\
+                [data["model"]]\
+                [data["serial_number"]] = data
         except KeyError:
             flask.abort(status.NOT_FOUND)
 
@@ -98,24 +99,68 @@ class MockSystem(object):
         except KeyError:
             flask.abort(status.NOT_FOUND)
 
-    def create_parameter(self, parameter_id, data):
-        if parameter_id in self.parameters:
-            self.logger.debug("duplicate parameter:  %s", parameter_id)
-            flask.abort(status.CONFLICT)
-        else:
-            self.parameters[parameter_id] = data
+    def create_parameter(self, data):
+        platform_id = data["platform_id"]
+        manufacturer = data["manufacturer"]
+        model = data["model"]
+        serial_number = data["serial_number"]
+        phenomena = data["phenomena"]
+        if platform_id in self.platforms:
+            if platform_id not in self.parameters:
+                self.parameters[platform_id] = {}
 
-    def get_parameter(self, parameter_id):
-        if parameter_id in self.parameters:
-            data = self.parameters[parameter_id]
+            if manufacturer not in self.parameters[platform_id]:
+                self.parameters[platform_id][manufacturer] = {}
+
+            if model not in self.parameters[platform_id][manufacturer]:
+                self.parameters[platform_id][manufacturer][model] = {}
+
+            if serial_number not in self.parameters[platform_id][manufacturer][model]:
+                self.parameters[platform_id][manufacturer][model][serial_number] = {}
+
+            if phenomena in self.parameters[platform_id][manufacturer][model][serial_number]:
+                flask.abort(status.CONFLICT)
+            else:
+                self.parameters\
+                    [platform_id]\
+                    [manufacturer]\
+                    [model]\
+                    [serial_number]\
+                    [phenomena] = data
         else:
+            flask.abort(status.NOT_FOUND)
+
+    def get_parameter(self,
+                      platform_id,
+                      manufacturer,
+                      model,
+                      serial_number,
+                      phenomena):
+        try:
+            data = self.parameters\
+                    [platform_id]\
+                    [manufacturer]\
+                    [model]\
+                    [serial_number]\
+                    [phenomena]
+        except KeyError:
             flask.abort(status.NOT_FOUND)
         return data
 
-    def delete_parameter(self, parameter_id):
-        if parameter_id in self.parameters:
-            del self.parameters[parameter_id]
-        else:
+    def delete_parameter(self,
+                         platform_id,
+                         manufacturer,
+                         model,
+                         serial_number,
+                         phenomena):
+        try:
+            del self.parameters\
+                    [platform_id]\
+                    [manufacturer]\
+                    [model]\
+                    [serial_number]\
+                    [phenomena]
+        except KeyError:
             flask.abort(status.NOT_FOUND)
 
     def get_parameters(self):

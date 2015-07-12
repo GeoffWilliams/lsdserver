@@ -19,17 +19,46 @@
 from flask import Blueprint, render_template, abort, request, current_app
 from jinja2 import TemplateNotFound
 from lsdserver import status
+from lsdserver.helper import Helper
 import flask
 
-parameter = Blueprint('parameter', __name__,
-                        template_folder='templates')
+parameter = Blueprint('parameter', __name__, template_folder='templates')
 
 
+@parameter.route(
+    '/<platform_id>/<manufacturer>/<model>/<serial_number>/<path:phenomena>',
+    methods=['PUT'])
+def create(platform_id, manufacturer, model, serial_number, phenomena):
+    return Helper.create(request, current_app.system.create_parameter, {
+        "platform_id": platform_id,
+        "manufacturer": manufacturer,
+        "model": model,
+        "serial_number": serial_number,
+        "phenomena": phenomena
+    })
 
-def want_json():
-    current_app.logger.debug(
-        "request.accept_mimetypes: " + str(request.accept_mimetypes))
-    return 'application/json' in request.accept_mimetypes
+
+@parameter.route(
+    '/<platform_id>/<manufacturer>/<model>/<serial_number>/<path:phenomena>',
+    methods=['GET']
+)
+def get(platform_id, manufacturer, model, serial_number, phenomena):
+    data = current_app.system.get_parameter(
+        platform_id, manufacturer, model, serial_number, phenomena)
+    payload = flask.jsonify(data)
+    return payload, status.OK
+
+@parameter.route(
+    '/<platform_id>/<manufacturer>/<model>/<serial_number>/<path:phenomena>',
+    methods=['DELETE']
+)
+def delete(platform_id, manufacturer, model, serial_number, phenomena):
+    current_app.system.delete_parameter(
+        platform_id, manufacturer, model, serial_number, phenomena)
+    return "result", status.OK
+# ================================= old crud below========
+
+
 
 
 @parameter.route('/', methods=['GET'])

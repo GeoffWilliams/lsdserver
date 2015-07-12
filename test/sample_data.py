@@ -52,12 +52,13 @@ This is some sample info, it will be created as a file and read back
     """
     Parameter
     """
+    sample_parameter_phenomena = sample_phenomena_term
     sample_parameter = {
         "platform_id": sample_platform_id,
         "manufacturer": sample_sensor_manufacturer,
         "model": sample_sensor_model,
         "serial_number": sample_sensor_serial_number,
-        "phenomena": sample_phenomena_term
+        "phenomena": sample_parameter_phenomena
     }
 
     """

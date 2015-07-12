@@ -99,7 +99,7 @@ class LsdBackend(object):
 
 
     @abstractmethod
-    def create_sensor(self, platform_id, sensor_id, data):
+    def create_sensor(self, data):
         pass
 
     @abstractmethod
@@ -115,15 +115,25 @@ class LsdBackend(object):
         pass
 
     @abstractmethod
-    def create_parameter(self, parameter_id, data):
+    def create_parameter(self, data):
         pass
 
     @abstractmethod
-    def get_parameter(self, parameter_id):
+    def get_parameter(self,
+                      platform_id,
+                      manufacturer,
+                      model,
+                      serial_number,
+                      phenomena):
         pass
 
     @abstractmethod
-    def delete_parameter(self, parameter_id):
+    def delete_parameter(self,
+                         platform_id,
+                         manufacturer,
+                         model,
+                         serial_number,
+                         phenomena):
         pass
 
     @abstractmethod

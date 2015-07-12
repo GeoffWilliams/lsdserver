@@ -30,6 +30,7 @@ import flask
 from flask import render_template, current_app
 import json
 import logging
+import urllib
 from lsdserver.backend.mysql import Mysql
 from lsdserver.driver import LsdBackend
 from sample_data import SampleData
@@ -416,33 +417,88 @@ class TestRestApi(unittest.TestCase):
     """
     def test_create_parameter(self):
         """create a parameter"""
-        pass
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
+
+        resp = self.client.put(
+            '/parameter/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number + "/" +
+            urllib.quote_plus(SampleData.sample_parameter_phenomena),
+            data=json.dumps(SampleData.sample_parameter),
+            content_type='application/json')
+        self.assertEquals(status.CREATED, resp.status_code)
+
 
     def test_create_parameter_invalid(self):
         """attempt to create an invalid parameter"""
-        pass
+        resp = self.client.put(
+            '/parameter/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number + "/" +
+            urllib.quote_plus(SampleData.sample_parameter_phenomena),
+            data=json.dumps(SampleData.sample_parameter),
+            content_type='application/json')
+        self.assertEquals(status.NOT_FOUND, resp.status_code)
 
     """
     # Read
     """
     def test_read_parameter(self):
         """read a valid parameter"""
-        pass
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
+        self.app.system.create_parameter(SampleData.sample_parameter)
+        resp = self.client.get(
+            '/parameter/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number + "/" +
+            urllib.quote_plus(SampleData.sample_parameter_phenomena))
+
+        json_data = json.loads(resp.data)
+        self.assertEqual(status.OK, resp.status_code)
+        self.assertEqual(SampleData.sample_parameter, json_data)
 
     def test_read_parameter_invalid(self):
         """read an invalid parameter"""
-        pass
+        resp = self.client.get(
+            '/parameter/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number + "/" +
+            urllib.quote_plus(SampleData.sample_parameter_phenomena))
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     """
     # Delete
     """
     def test_delete_parameter(self):
         """delete a parameter"""
-        pass
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
+        self.app.system.create_parameter(SampleData.sample_parameter)
+        resp = self.client.delete(
+            '/parameter/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number + "/" +
+            urllib.quote_plus(SampleData.sample_parameter_phenomena))
+
+        self.assertEqual(status.OK, resp.status_code)
 
     def test_delete_parameter_invalid(self):
         """attempt to delte an invalid parameter"""
-        pass
+        resp = self.client.delete(
+            '/parameter/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number + "/" +
+            urllib.quote_plus(SampleData.sample_parameter_phenomena))
+
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     """
     #

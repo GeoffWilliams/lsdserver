@@ -19,16 +19,11 @@
 from flask import Blueprint, render_template, abort, request, current_app
 from jinja2 import TemplateNotFound
 from lsdserver import status
+from lsdserver.helper import Helper
 import flask
 
 ui = Blueprint('ui', __name__,
                         template_folder='templates')
-
-
-def want_json():
-    current_app.logger.debug(
-        "request.accept_mimetypes: " + str(request.accept_mimetypes))
-    return 'application/json' in request.accept_mimetypes
 
 
 @ui.route('/', methods=['GET'])
