@@ -1,9 +1,10 @@
 import logging
 import flask
 from lsdserver import status
+from lsdserver.driver import LsdBackend
 
 
-class MockSystem(object):
+class MockSystem(LsdBackend):
     logger = logging.getLogger('lsdserver.MockSystem')
     logger.setLevel(logging.DEBUG)
 
@@ -11,6 +12,7 @@ class MockSystem(object):
         self.parameters = {}
         self.platforms = {}
         self.sensors = {}
+        self.phenomena = {}
 
     def get_platform(self, platform_id):
         data = None
@@ -24,7 +26,9 @@ class MockSystem(object):
         try:
             data = self.sensors[platform_id][manufacturer][model][serial_number]
         except KeyError:
-            self.logger.debug('sensor not found:  ' + platform_id + '/' + manufacturer + '/' + model + '/' + serial_number)
+            self.logger.debug(
+                'sensor not found:  ' + platform_id + '/' + manufacturer + '/' +
+                model + '/' + serial_number)
             flask.abort(status.NOT_FOUND)
         return data
 
@@ -165,3 +169,21 @@ class MockSystem(object):
 
     def get_parameters(self):
         return self.parameters
+
+    def create_phenomena(self, data):
+        if data["term"] in self.phenomena:
+            flask.abort(status.CONFLICT)
+        else:
+            self.phenomena[data["term"]] = data
+
+    def get_phenomena(self, term):
+        try:
+            return self.phenomena[term]
+        except KeyError:
+            flask.abort(status.NOT_FOUND)
+
+    def delete_phenomena(self, term):
+        try:
+            del self.phenomena[term]
+        except KeyError:
+            flask.abort(status.NOT_FOUND)

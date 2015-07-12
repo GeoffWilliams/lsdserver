@@ -70,5 +70,13 @@ class Mysql(LsdBackend):
     def get_parameters(self):
         pass
 
+    def create_phenomena(self, data):
+        pass
+
+    def get_phenomena(self, term):
+        pass
+
+    def delete_phenomena(self, term):
+        pass
 
 LsdBackend.register(Mysql)

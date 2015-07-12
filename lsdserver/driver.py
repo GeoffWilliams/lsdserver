@@ -139,3 +139,15 @@ class LsdBackend(object):
     @abstractmethod
     def get_parameters(self):
         pass
+
+    @abstractmethod
+    def create_phenomena(self, data):
+        pass
+
+    @abstractmethod
+    def get_phenomena(self, term):
+        pass
+
+    @abstractmethod
+    def delete_phenomena(self, term):
+        pass

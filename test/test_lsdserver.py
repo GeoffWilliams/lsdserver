@@ -516,7 +516,13 @@ class TestRestApi(unittest.TestCase):
     """
     def test_create_phenomena(self):
         """create a phenomena"""
-        pass
+        resp = self.client.put(
+            '/phenomena/' + urllib.quote_plus(SampleData.sample_phenomena_term),
+            data=json.dumps(SampleData.sample_parameter),
+            content_type='application/json')
+
+        self.assertEqual(status.CREATED, resp.status_code)
+
 
     def test_create_phenomena_invalid(self):
         """attempt to create an invalid phenomena"""
@@ -527,22 +533,39 @@ class TestRestApi(unittest.TestCase):
     """
     def test_read_phenomena(self):
         """read a phenomena by id"""
-        pass
+        self.app.system.create_phenomena(SampleData.sample_phenomena)
+
+        resp = self.client.get(
+            '/phenomena/' + urllib.quote_plus(SampleData.sample_phenomena_term))
+
+        json_data = json.loads(resp.data)
+        self.assertEqual(status.OK, resp.status_code)
+        self.assertEqual(SampleData.sample_phenomena, json_data)
 
     def test_read_phenomena_invalid(self):
         """attempt to read invalid phenomena"""
-        pass
+        resp = self.client.get(
+            '/phenomena/' + urllib.quote_plus(SampleData.sample_phenomena_term))
+
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     """
     Delete
     """
     def test_delete_phenomena(self):
         """delete a phenomena"""
-        pass
+        self.app.system.create_phenomena(SampleData.sample_phenomena)
+        resp = self.client.delete(
+            '/phenomena/' + SampleData.sample_phenomena_term)
+
+        self.assertEqual(status.OK, resp.status_code)
 
     def test_delete_phenomena_invalid(self):
         """attempt to delete an invalid phenomena"""
-        pass
+        resp = self.client.delete(
+            '/phenomena/' + SampleData.sample_phenomena_term)
+
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     """
     # Flag API
