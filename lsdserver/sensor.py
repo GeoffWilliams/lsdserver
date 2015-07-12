@@ -54,4 +54,4 @@ def get(platform_id, manufacturer, model, serial_number):
 @sensor.route('/<platform_id>/<manufacturer>/<model>/<serial_number>', methods=['DELETE'])
 def delete(platform_id, manufacturer, model, serial_number):
     current_app.system.delete_sensor(platform_id, manufacturer, model, serial_number)
-    return "result", status.OK
+    return "result", status.NO_CONTENT

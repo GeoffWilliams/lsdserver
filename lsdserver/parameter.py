@@ -55,7 +55,7 @@ def get(platform_id, manufacturer, model, serial_number, phenomena):
 def delete(platform_id, manufacturer, model, serial_number, phenomena):
     current_app.system.delete_parameter(
         platform_id, manufacturer, model, serial_number, phenomena)
-    return "result", status.OK
+    return "result", status.NO_CONTENT
 # ================================= old crud below========
 
 

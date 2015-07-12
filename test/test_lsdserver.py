@@ -158,7 +158,7 @@ class TestRestApi(unittest.TestCase):
 
         # then try to delete it
         resp = self.client.delete(uri)
-        self.assertEquals(status.OK, resp.status_code)
+        self.assertEquals(status.NO_CONTENT, resp.status_code)
 
         # and check you get a 404 if you try to access old platform
         resp = self.client.get(uri)
@@ -362,7 +362,7 @@ class TestRestApi(unittest.TestCase):
             SampleData.sample_sensor_manufacturer + "/" +
             SampleData.sample_sensor_model + "/" +
             SampleData.sample_sensor_serial_number)
-        self.assertEqual(status.OK, resp.status_code)
+        self.assertEqual(status.NO_CONTENT, resp.status_code)
 
     def test_sensor_delete_invalid(self):
         """attempt to delete an unregistered sensor"""
@@ -487,7 +487,7 @@ class TestRestApi(unittest.TestCase):
             SampleData.sample_sensor_serial_number + "/" +
             urllib.quote_plus(SampleData.sample_parameter_phenomena))
 
-        self.assertEqual(status.OK, resp.status_code)
+        self.assertEqual(status.NO_CONTENT, resp.status_code)
 
     def test_delete_parameter_invalid(self):
         """attempt to delte an invalid parameter"""
@@ -558,7 +558,7 @@ class TestRestApi(unittest.TestCase):
         resp = self.client.delete(
             '/phenomena/' + urllib.quote_plus(SampleData.sample_phenomena_term))
 
-        self.assertEqual(status.OK, resp.status_code)
+        self.assertEqual(status.NO_CONTENT, resp.status_code)
 
     def test_delete_phenomena_invalid(self):
         """attempt to delete an invalid phenomena"""
@@ -619,7 +619,7 @@ class TestRestApi(unittest.TestCase):
         resp = self.client.delete(
             '/flag/' + urllib.quote_plus(SampleData.sample_flag_term))
 
-        self.assertEqual(status.OK, resp.status_code)
+        self.assertEqual(status.NO_CONTENT, resp.status_code)
 
     def test_flag_delete_invalid(self):
         resp = self.client.delete(

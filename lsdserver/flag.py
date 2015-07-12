@@ -33,7 +33,7 @@ def create(term):
 @flag.route('/<path:term>', methods=['DELETE'])
 def delete(term):
     current_app.system.delete_flag(term)
-    return "processed", status.OK
+    return "processed", status.NO_CONTENT
 
 
 @flag.route('/<path:term>', methods=['GET'])

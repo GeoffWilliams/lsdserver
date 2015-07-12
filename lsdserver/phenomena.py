@@ -33,7 +33,7 @@ def create(term):
 @phenomena.route('/<path:term>', methods=['DELETE'])
 def delete(term):
     current_app.system.delete_phenomena(term)
-    return "processed", status.OK
+    return "processed", status.NO_CONTENT
 
 
 @phenomena.route('/<path:term>', methods=['GET'])

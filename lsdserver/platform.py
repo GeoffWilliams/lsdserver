@@ -70,7 +70,7 @@ def create(platform_id):
 @platform.route('/<platform_id>', methods=['DELETE'])
 def delete(platform_id):
     current_app.system.delete_platform(platform_id)
-    return render_template('platform.html'), status.OK
+    return render_template('platform.html'), status.NO_CONTENT
 
 
 @platform.route('/<platform_id>/info', methods=['GET'])
