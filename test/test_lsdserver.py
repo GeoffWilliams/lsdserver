@@ -74,8 +74,7 @@ class TestRestApi(unittest.TestCase):
         """check data returned for version"""
         resp = self.client.get('/version/')
         self.assertEqual(status.OK, resp.status_code)
-        # FIXME check we are returning a valid version number
-
+        self.assertEqual("wip", resp.data)
     """
     #
     # Platform API
@@ -244,47 +243,47 @@ class TestRestApi(unittest.TestCase):
     /platform/?FIELD=QUERY
     """
 
-    def platform_filter_platform_id(self):
+    def test_platform_filter_platform_id(self):
         """filter platforms by ID"""
         pass
 
-    def platform_filter_platform_name(self):
+    def test_platform_filter_platform_name(self):
         """filter platforms by name"""
         pass
 
-    def platform_filter_platform_description(self):
+    def test_platform_filter_platform_description(self):
         """filter platforms by description"""
         pass
 
-    def platform_filter_platform_info(self):
+    def test_platform_filter_platform_info(self):
         """filter platforms by info"""
         pass
 
-    def platform_filter_platform_location(self):
+    def test_platform_filter_platform_location(self):
         """filter platforms by location"""
         pass
 
-    def platform_filter_sensor_manufacturer(self):
+    def test_platform_filter_sensor_manufacturer(self):
         """filter platforms by sensor manufacturer"""
         pass
 
-    def platform_filter_sensor_model(self):
+    def test_platform_filter_sensor_model(self):
         """filter platforms by sensor model"""
         pass
 
-    def platform_filter_sensor_serial_number(self):
+    def test_platform_filter_sensor_serial_number(self):
         """filter platforms by serial number"""
         pass
 
-    def platform_filter_sensor_description(self):
+    def test_platform_filter_sensor_description(self):
         """filter platforms by sensor description"""
         pass
 
-    def platform_filter_sensor_info(self):
+    def test_platform_filter_sensor_info(self):
         """filter platforms by sensor info field"""
         pass
 
-    def platform_filter_parameter_phenomena(self):
+    def test_platform_filter_parameter_phenomena(self):
         """filter platforms by phenomena"""
         pass
 
@@ -297,19 +296,89 @@ class TestRestApi(unittest.TestCase):
     """
     # create
     """
+    def test_sensor_create(self):
+        # put a platform...
+        self.app.system.create_platform(SampleData.sample_platform)
+
+        resp = self.client.put(
+            '/sensor/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number,
+            data=json.dumps(SampleData.sample_sensor),
+            content_type='application/json')
+        self.assertEquals(status.CREATED, resp.status_code)
+
+    def test_sensor_create_invalid(self):
+        """attempt to create sensor associated with platform that has not been
+        created"""
+        resp = self.client.put(
+            '/sensor/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number,
+            data=json.dumps(SampleData.sample_sensor),
+            content_type='application/json')
+        self.assertEquals(status.NOT_FOUND, resp.status_code)
 
     """
     # read
     """
+    def test_sensor_read(self):
+        """register a platform and sensor, then try to read the sensor"""
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
+
+        resp = self.client.get(
+            '/sensor/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number)
+        json_data = json.loads(resp.data)
+        self.assertEqual(status.OK, resp.status_code)
+        self.assertEqual(SampleData.sample_sensor, json_data)
+
+    def test_sensor_read_invalid(self):
+        """Try reading an unregistered sensor"""
+        resp = self.client.get(
+            '/sensor/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number)
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     """
     # delete
     """
+    def test_sensor_delete(self):
+        """register a platform and sensor, then try to delete the sensor"""
+        self.app.system.create_platform(SampleData.sample_platform)
+        self.app.system.create_sensor(SampleData.sample_sensor)
 
+        resp = self.client.delete(
+            '/sensor/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number)
+        self.assertEqual(status.OK, resp.status_code)
+
+    def test_sensor_delete_invalid(self):
+        """attempt to delete an unregistered sensor"""
+        resp = self.client.delete(
+            '/sensor/' + SampleData.sample_platform_id + "/" +
+            SampleData.sample_sensor_manufacturer + "/" +
+            SampleData.sample_sensor_model + "/" +
+            SampleData.sample_sensor_serial_number)
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
     """
     # info
     # /sensor/*/info
     """
+    def test_sensor_info_read(self):
+        pass
+
+    def test_sensor_read_write(self):
+        pass
 
     """
     #

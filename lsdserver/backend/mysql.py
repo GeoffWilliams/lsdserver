@@ -34,7 +34,7 @@ class Mysql(LsdBackend):
     def get_platform(self, platform_id):
         return self.session.query(Platform).filter(Platform.id == platform_id).first()
 
-    def get_sensor(self, platform_id, sensor_id):
+    def get_sensor(self, platform_id, manufacturer, model, serial_number):
         pass
 
     def get_platforms(self):
