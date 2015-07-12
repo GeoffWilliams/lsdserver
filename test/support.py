@@ -13,6 +13,7 @@ class MockSystem(LsdBackend):
         self.platforms = {}
         self.sensors = {}
         self.phenomena = {}
+        self.flags = {}
 
     def get_platform(self, platform_id):
         data = None
@@ -185,5 +186,23 @@ class MockSystem(LsdBackend):
     def delete_phenomena(self, term):
         try:
             del self.phenomena[term]
+        except KeyError:
+            flask.abort(status.NOT_FOUND)
+
+    def create_flag(self, data):
+        if data["term"] in self.flags:
+            flask.abort(status.CONFLICT)
+        else:
+            self.flags[data["term"]] = data
+
+    def get_flag(self, term):
+        try:
+            return self.flags[term]
+        except KeyError:
+            flask.abort(status.NOT_FOUND)
+
+    def delete_flag(self, term):
+        try:
+            del self.flags[term]
         except KeyError:
             flask.abort(status.NOT_FOUND)

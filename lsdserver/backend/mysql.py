@@ -79,4 +79,13 @@ class Mysql(LsdBackend):
     def delete_phenomena(self, term):
         pass
 
+    def create_flag(self, data):
+        pass
+
+    def get_flag(self, term):
+        pass
+
+    def delete_flag(self, term):
+        pass
+
 LsdBackend.register(Mysql)

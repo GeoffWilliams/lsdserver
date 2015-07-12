@@ -151,3 +151,15 @@ class LsdBackend(object):
     @abstractmethod
     def delete_phenomena(self, term):
         pass
+
+    @abstractmethod
+    def create_flag(self, data):
+        pass
+
+    @abstractmethod
+    def get_flag(self, term):
+        pass
+
+    @abstractmethod
+    def delete_flag(self, term):
+        pass

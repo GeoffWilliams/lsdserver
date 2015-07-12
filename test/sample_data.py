@@ -61,6 +61,12 @@ This is some sample info, it will be created as a file and read back
         "phenomena": sample_parameter_phenomena
     }
 
+    sample_flag_term = "http://flagid"
+    sample_flag = {
+        "term": sample_flag_term,
+        "description": "flag description"
+    }
+
     """
     Observation
     """

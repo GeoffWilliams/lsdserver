@@ -26,6 +26,7 @@ from lsdserver.parameter import parameter
 from lsdserver.version import version
 from lsdserver.sensor import sensor
 from lsdserver.phenomena import phenomena
+from lsdserver.flag import flag
 from lsdserver.ui import ui
 from lsdserver import status
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -75,6 +76,7 @@ def create_app(app_dir):
     app.register_blueprint(parameter, url_prefix='/parameter')
     app.register_blueprint(sensor, url_prefix='/sensor')
     app.register_blueprint(phenomena, url_prefix='/phenomena')
+    app.register_blueprint(flag, url_prefix='/flag')
     app.register_blueprint(ui, url_prefix="")
 
     # database

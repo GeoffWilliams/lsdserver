@@ -556,14 +556,14 @@ class TestRestApi(unittest.TestCase):
         """delete a phenomena"""
         self.app.system.create_phenomena(SampleData.sample_phenomena)
         resp = self.client.delete(
-            '/phenomena/' + SampleData.sample_phenomena_term)
+            '/phenomena/' + urllib.quote_plus(SampleData.sample_phenomena_term))
 
         self.assertEqual(status.OK, resp.status_code)
 
     def test_delete_phenomena_invalid(self):
         """attempt to delete an invalid phenomena"""
         resp = self.client.delete(
-            '/phenomena/' + SampleData.sample_phenomena_term)
+            '/phenomena/' + urllib.quote_plus(SampleData.sample_phenomena_term))
 
         self.assertEqual(status.NOT_FOUND, resp.status_code)
 
@@ -582,7 +582,12 @@ class TestRestApi(unittest.TestCase):
     Create
     """
     def test_flag_create(self):
-        pass
+        resp = self.client.put(
+            '/flag/' + urllib.quote_plus(SampleData.sample_flag_term),
+            data=json.dumps(SampleData.sample_flag),
+            content_type='application/json')
+
+        self.assertEqual(status.CREATED, resp.status_code)
 
     def test_flag_create_invalid(self):
         pass
@@ -591,19 +596,36 @@ class TestRestApi(unittest.TestCase):
     Read
     """
     def test_flag_read(self):
-        pass
+        self.app.system.create_flag(SampleData.sample_flag)
+
+        resp = self.client.get(
+            '/flag/' + urllib.quote_plus(SampleData.sample_flag_term))
+
+        json_data = json.loads(resp.data)
+        self.assertEqual(status.OK, resp.status_code)
+        self.assertEqual(SampleData.sample_flag, json_data)
 
     def test_flag_read_invalid(self):
-        pass
+        resp = self.client.get(
+            '/flag/' + urllib.quote_plus(SampleData.sample_flag_term))
+
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     """
     Delete
     """
     def test_flag_delete(self):
-        pass
+        self.app.system.create_flag(SampleData.sample_flag)
+        resp = self.client.delete(
+            '/flag/' + urllib.quote_plus(SampleData.sample_flag_term))
+
+        self.assertEqual(status.OK, resp.status_code)
 
     def test_flag_delete_invalid(self):
-        pass
+        resp = self.client.delete(
+            '/flag/' + urllib.quote_plus(SampleData.sample_flag_term))
+
+        self.assertEqual(status.NOT_FOUND, resp.status_code)
 
     """
     #
