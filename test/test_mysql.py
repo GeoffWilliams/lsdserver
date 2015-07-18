@@ -13,11 +13,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
 from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func
 from sqlalchemy.orm import relationship, backref
-#from lsdserver.driver import Platform
+from lsdserver.backend.mysql import Platform
+from lsdserver.backend.mysql import Sensor
+from lsdserver.backend.mysql import Parameter
+from sample_data import SampleData
+
 from lsdserver.base import Base
-from lsdserver.driver import Parameter
-from lsdserver.driver import Sensor
-from lsdserver.driver import Platform
+
+from sample_data import SampleData
 
 
 class TestMysql(unittest.TestCase):
@@ -30,36 +33,39 @@ class TestMysql(unittest.TestCase):
     db_service_name = "mysql"
     db_url = "mysql:///" + db_name
 
-    def demo_platform_obj(self):
+    def demo_platform(self):
         platform = Platform()
-        platform.id = 1
-        platform.name = "platform_name"
-        platform.description = "platform_description"
-        platform.position = "(0,0)"
-        platform.link = "http:///"
-        platform.mobile = "no"
+        platform.platform_id = SampleData.sample_platform["platform_id"]
+        platform.name = SampleData.sample_platform["name"]
+        platform.description = SampleData.sample_platform["description"]
+        platform.info = SampleData.sample_platform["info"]
+        platform.location = SampleData.sample_platform["location"]
+        self.db_session.add(platform)
+        self.db_session.commit()
         return platform
 
-    def demo_parameter_obj(self):
-        parameter = Parameter()
-        parameter.id = 2
-        parameter.description = "paramter_description"
-        parameter.type = "parameter_type"
-        return parameter
+#    def demo_parameter_obj(self):
+        #parameter = Parameter()
+        #parameter.id = 2
+        #parameter.description = "paramter_description"
+        #parameter.type = "parameter_type"
+        #return parameter
 
 
 
     engine = None
     db_session = None
 
-    def demo_sensor_obj(self):
+    def demo_sensor(self):
         sensor = Sensor()
-        sensor.id = 3
-        sensor.manufacturer = "manufacturer"
-        sensor.model = "model"
-        sensor.serial_number = "serial_number"
-        sensor.name = "name"
-        sensor.description = "description"
+        sensor.platform_id = SampleData.sample_sensor["platform_id"]
+        sensor.manufacturer = SampleData.sample_sensor["manufacturer"]
+        sensor.model = SampleData.sample_sensor["model"]
+        sensor.serial_number = SampleData.sample_sensor["serial_number"]
+        sensor.description = SampleData.sample_sensor["description"]
+        sensor.info = SampleData.sample_sensor["info"]
+        self.db_session.add(sensor)
+        self.db_session.commit()
         return sensor
 
     @classmethod
@@ -70,6 +76,14 @@ class TestMysql(unittest.TestCase):
 
     def setUp(self):
         self.create_db()
+#        self.run_sql("TRUNCATE TABLE " + self.db_name + ".phenomena")
+#        self.run_sql("TRUNCATE TABLE " + self.db_name + ".flag")
+
+        # NASTY HACK FOR TESTING...
+        self.run_sql("SET FOREIGN_KEY_CHECKS = 0;TRUNCATE TABLE " + self.db_name + ".platform")
+        self.run_sql("SET FOREIGN_KEY_CHECKS = 0;TRUNCATE TABLE " + self.db_name + ".sensor")
+        self.run_sql("SET FOREIGN_KEY_CHECKS = 0;TRUNCATE TABLE " + self.db_name + ".parameter")
+
         self.backend.session = self.db_session
 
     def tearDown(self):
@@ -97,29 +111,24 @@ class TestMysql(unittest.TestCase):
                                                  bind=self.engine))
 
     def drop_db(self):
-        self.db_session.query(Platform).delete()
         self.db_session.query(Parameter).delete()
         self.db_session.query(Sensor).delete()
+        self.db_session.query(Platform).delete()
         self.db_session.commit()
         self.db_session.remove()
 
-    def demo_platform(self):
-        platform = self.demo_platform_obj()
-        self.db_session.add(platform)
-        self.db_session.commit()
-        return platform
 
-    def demo_sensor(self):
-        sensor = self.demo_sensor_obj()
-        self.db.session.add(sensor)
-        self.db.session.commit()
-        return sensor
+    #def demo_sensor(self):
+        #sensor = self.demo_sensor_obj()
+        #self.db.session.add(sensor)
+        #self.db.session.commit()
+        #return sensor
 
-    def demo_parameter(self):
-        parameter = self.demo_parameter_obj()
-        self.db.session.add(parameter)
-        self.db.session.commit()
-        return parameter
+##    def demo_parameter(self):
+        #parameter = self.demo_parameter_obj()
+        #self.db.session.add(parameter)
+        #self.db.session.commit()
+        #return parameter
 
     #
     # get_platform()
@@ -133,13 +142,8 @@ class TestMysql(unittest.TestCase):
     def test_get_platform_data(self):
         """get_platform() when data loaded"""
         platform = self.demo_platform()
-        data = self.backend.get_platform(platform.id)
-        self.assertEqual(data.id, platform.id)
-        self.assertEqual(data.name, platform.name)
-        self.assertEqual(data.description, platform.description)
-        self.assertEqual(data.position, platform.position)
-        self.assertEqual(data.link, platform.link)
-        self.assertEqual(data.mobile, platform.mobile)
+        data = self.backend.get_platform(platform.platform_id)
+        self.assertTrue(data)
 
     #
     # get_platforms()
@@ -156,33 +160,31 @@ class TestMysql(unittest.TestCase):
         data = self.backend.get_platforms()
         self.assertEqual(len(data), 1)
 
+
     #
     # get_sensor()
     #
-#    def test_get_sensor_no_data(self):
-#        """ get_sensor() with no data loaded """
-#        data = self.backend.get_sensor("abc")
-#        self.assertEqual(len(data), 0)
+    def test_get_sensor_no_data(self):
+        """ get_sensor() with no data loaded """
+        data = self.backend.get_sensor("abc", "abc", "abc", "abc")
+        self.assertFalse(data)
 
-#    def test_get_sensor_data(self):
-#        """ get_sensor() with data loaded"""
-#        sensor = self.demo_sensor()
-#        data = self.backend.get_sensor(sensor.id)
-#        self.assertTrue(data)
-#        self.assertEqual(data.id, sensor.id)
-#        self.assertEqual(data.manufacturer, sensor.manufacturer)
-#        self.assertEqual(data.model, sensor.model)
-#        self.assertEqual(data.serial_number, sensor.serial_number)
-#        self.assertEqual(data.name, sensor.name)
-#       self.assertEqual(data.description, sensor.description)
+    def test_get_sensor_data(self):
+        """ get_sensor() with data loaded"""
+        platform = self.demo_platform()
+        sensor = self.demo_sensor()
+        data = self.backend.get_sensor(sensor.platform_id, sensor.manufacturer, sensor.model, sensor.serial_number)
+        self.assertTrue(data)
     #
     # create_platform()
     #
-
     def test_create_platform(self):
-        pass
+        """create a platform and attempt to read it back"""
+        self.backend.create_platform(SampleData.sample_platform)
+        data = self.backend.get_platforms()
+        self.assertEqual(len(data), 1)
 
-    def test_create_platform_dup(self):
+#    def test_create_platform_dup(self):
         pass
 
     #

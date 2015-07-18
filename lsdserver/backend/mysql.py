@@ -19,12 +19,44 @@
 
 import flask
 from lsdserver.driver import LsdBackend
-from lsdserver.driver import Platform
-from lsdserver.driver import Parameter
-from lsdserver.driver import Sensor
 
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func, ForeignKeyConstraint
+from sqlalchemy.orm import relationship, backref
+#from sqlalchemy.ext.declarative import declarative_base
+from lsdserver.base import Base
 
 #fixme!! rename to sql alchemy
+
+FIELD_LENGTH = 255
+
+class Platform(Base):
+    __tablename__ = "platform"
+    platform_id = Column(String(FIELD_LENGTH), primary_key=True)
+    name = Column(String(100))
+    description = Column(String(100))
+    info = Column(String(100))
+    location = Column(String(100))
+
+class Sensor(Base):
+    __tablename__ = 'sensor'
+    platform_id = Column(String(FIELD_LENGTH), ForeignKey("platform.platform_id"), primary_key=True)
+    manufacturer = Column(String(FIELD_LENGTH), primary_key=True)
+    model = Column(String(FIELD_LENGTH), primary_key=True)
+    serial_number = Column(String(FIELD_LENGTH), primary_key=True)
+    description = Column(String(100))
+    info = Column(String(100))
+
+
+class Parameter(Base):
+    __tablename__ = 'parameter'
+    platform_id = Column(String(FIELD_LENGTH), primary_key=True)
+    manufacturer = Column(String(FIELD_LENGTH),primary_key=True)
+    model = Column(String(FIELD_LENGTH), primary_key=True)
+    serial_number = Column(String(FIELD_LENGTH), primary_key=True)
+    phenomena = Column(String(100))
+    __table_args__ = (ForeignKeyConstraint([platform_id, manufacturer, model, serial_number],
+                                           [Sensor.platform_id, Sensor.manufacturer, Sensor.model, Sensor.serial_number]),
+                      {})
 
 
 class Mysql(LsdBackend):
@@ -32,16 +64,27 @@ class Mysql(LsdBackend):
     session = None
 
     def get_platform(self, platform_id):
-        return self.session.query(Platform).filter(Platform.id == platform_id).first()
+        return self.session.query(Platform).filter(Platform.platform_id == platform_id).first()
 
     def get_sensor(self, platform_id, manufacturer, model, serial_number):
-        pass
+        return self.session.query(Sensor).filter(
+            Sensor.platform_id == platform_id,
+            Sensor.manufacturer == manufacturer,
+            Sensor.model == model,
+            Sensor.serial_number == serial_number).first()
 
     def get_platforms(self):
         return self.session.query(Platform).all()
 
-    def create_platform(self, data):
-        pass
+    def create_platform(self, platform_dict):
+        platform = Platform()
+        platform.platform_id = platform_dict["platform_id"]
+        platform.name = platform_dict["name"]
+        platform.description = platform_dict["description"]
+        platform.info = platform_dict["info"]
+        platform.location = platform_dict["location"]
+        self.session.add(platform)
+        self.session.commit()
 
     def create_sensor(self, platform_id, sensor_id, data):
         pass

@@ -25,29 +25,32 @@ from lsdserver.base import Base
 
 #Base = declarative_base()
 
-class Platform(Base):
-    __tablename__ = "platform"
-    id = Column(Integer, primary_key=True)
-    position = Column(String(100))
-    name = Column(String(100))
-    description = Column(String(100))
-    link = Column(String(100))
-    mobile = Column(String(100))
+##class Platform(Base):
+    #__tablename__ = "platform"
+    #id = Column(Integer, primary_key=True)
+    #position = Column(String(100))
+    #name = Column(String(100))
+    #description = Column(String(100))
+    #link = Column(String(100))
+    #mobile = Column(String(100))
 
-class Parameter(Base):
-    __tablename__ = 'parameter'
-    id = Column(Integer, primary_key=True)
-    type = Column(String(100))
+##    def parse_json(self, json):
+        #pass
 
-class Sensor(Base):
-    __tablename__ = 'sensor'
-    id = Column(Integer, primary_key=True)
-    platform_id = Column(Integer, ForeignKey("platform.id"), nullable=False)
-    manufacturer = Column(String(100))
-    model = Column(String(100))
-    serial_number = Column(String(100))
-    name = Column(String(100))
-    description = Column(String(100))
+##class Parameter(Base):
+    #__tablename__ = 'parameter'
+    #id = Column(Integer, primary_key=True)
+    #type = Column(String(100))
+
+##class Sensor(Base):
+    #__tablename__ = 'sensor'
+    #id = Column(Integer, primary_key=True)
+    #platform_id = Column(Integer, ForeignKey("platform.id"), nullable=False)
+    #manufacturer = Column(String(100))
+    #model = Column(String(100))
+    #serial_number = Column(String(100))
+    #name = Column(String(100))
+    #description = Column(String(100))
 
 class LsdBackend(object):
     """
