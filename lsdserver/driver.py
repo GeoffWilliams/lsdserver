@@ -100,7 +100,6 @@ class LsdBackend(object):
     def get_sensor(self, platform_id, manufacturer, model, serial_number):
         pass
 
-
     @abstractmethod
     def create_sensor(self, data):
         pass

@@ -144,6 +144,11 @@ class TestMysql(unittest.TestCase):
         platform = self.demo_platform()
         data = self.backend.get_platform(platform.platform_id)
         self.assertTrue(data)
+        self.assertEqual(SampleData.sample_platform["platform_id"], data["platform_id"])
+        self.assertEqual(SampleData.sample_platform["name"], data["name"])
+        self.assertEqual(SampleData.sample_platform["description"], data["description"])
+        self.assertEqual(SampleData.sample_platform["info"], data["info"])
+        self.assertEqual(SampleData.sample_platform["location"], data["location"])
 
     #
     # get_platforms()
@@ -159,6 +164,12 @@ class TestMysql(unittest.TestCase):
         self.demo_platform()
         data = self.backend.get_platforms()
         self.assertEqual(len(data), 1)
+
+        self.assertEqual(SampleData.sample_platform["platform_id"], data[0]["platform_id"])
+        self.assertEqual(SampleData.sample_platform["name"], data[0]["name"])
+        self.assertEqual(SampleData.sample_platform["description"], data[0]["description"])
+        self.assertEqual(SampleData.sample_platform["info"], data[0]["info"])
+        self.assertEqual(SampleData.sample_platform["location"], data[0]["location"])
 
 
     #
