@@ -186,6 +186,12 @@ class TestMysql(unittest.TestCase):
         sensor = self.demo_sensor()
         data = self.backend.get_sensor(sensor.platform_id, sensor.manufacturer, sensor.model, sensor.serial_number)
         self.assertTrue(data)
+        self.assertEqual(SampleData.sample_sensor["platform_id"], data["platform_id"])
+        self.assertEqual(SampleData.sample_sensor["manufacturer"], data["manufacturer"])
+        self.assertEqual(SampleData.sample_sensor["model"], data["model"])
+        self.assertEqual(SampleData.sample_sensor["serial_number"], data["serial_number"])
+        self.assertEqual(SampleData.sample_sensor["description"], data["description"])
+        self.assertEqual(SampleData.sample_sensor["info"], data["info"])
     #
     # create_platform()
     #

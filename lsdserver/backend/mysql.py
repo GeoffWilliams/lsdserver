@@ -72,11 +72,16 @@ class Mysql(LsdBackend):
         return json
 
     def get_sensor(self, platform_id, manufacturer, model, serial_number):
-        return self.session.query(Sensor).filter(
+        obj = self.session.query(Sensor).filter(
             Sensor.platform_id == platform_id,
             Sensor.manufacturer == manufacturer,
             Sensor.model == model,
             Sensor.serial_number == serial_number).first()
+        if obj:
+            json = obj.__dict__
+        else:
+            json = None
+        return json
 
     def get_platforms(self):
         data = self.session.query(Platform).all()
