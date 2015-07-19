@@ -44,12 +44,17 @@ class TestMysql(unittest.TestCase):
         self.db_session.commit()
         return platform
 
-#    def demo_parameter_obj(self):
-        #parameter = Parameter()
-        #parameter.id = 2
-        #parameter.description = "paramter_description"
-        #parameter.type = "parameter_type"
-        #return parameter
+    def demo_parameter(self):
+        parameter = Parameter()
+        parameter.platform_id = SampleData.sample_parameter["platform_id"]
+        parameter.manufacturer = SampleData.sample_parameter["manufacturer"]
+        parameter.model = SampleData.sample_parameter["model"]
+        parameter.serial_number = SampleData.sample_parameter["serial_number"]
+        parameter.phenomena = SampleData.sample_parameter["phenomena"]
+
+        self.db_session.add(parameter)
+        self.db_session.commit()
+        return parameter
 
 
 
@@ -208,7 +213,11 @@ class TestMysql(unittest.TestCase):
     # create_sensor()
     #
     def test_create_sensor(self):
-        pass
+        """Create a sensor and attempt to read it back"""
+        self.demo_platform()
+        self.backend.create_sensor(SampleData.sample_sensor)
+        data = self.backend.get_sensors()
+        self.assertEqual(len(data), 1)
 
     def test_create_sensor_dup(self):
         pass
@@ -220,7 +229,11 @@ class TestMysql(unittest.TestCase):
         pass
 
     def test_delete_platform(self):
-        pass
+        """create a platform and attempt to delete it"""
+        self.demo_platform()
+        self.backend.delete_platform(SampleData.sample_platform_id)
+        data = self.backend.get_platforms()
+        self.assertEqual(len(data), 0)
 
     #
     # delete_sensor()
@@ -229,13 +242,27 @@ class TestMysql(unittest.TestCase):
         pass
 
     def test_delete_sensor(self):
-        pass
+        """create a sensor and attempt to delete it"""
+        self.demo_platform()
+        self.demo_sensor()
+        self.backend.delete_sensor(
+            SampleData.sample_platform_id,
+            SampleData.sample_sensor_manufacturer,
+            SampleData.sample_sensor_model,
+            SampleData.sample_sensor_serial_number)
+        data = self.backend.get_sensors()
+        self.assertEqual(len(data), 0)
 
     #
     # create_parameter()
     #
     def test_create_parameter(self):
-        pass
+        """Create a parameter and attempt to read it back"""
+        self.demo_platform()
+        self.demo_sensor()
+        self.backend.create_parameter(SampleData.sample_parameter)
+        data = self.backend.get_parameters()
+        self.assertEqual(len(data), 1)
 
     def test_create_parameter_dup(self):
         pass
@@ -245,7 +272,8 @@ class TestMysql(unittest.TestCase):
     #
     def test_get_parameter_no_data(self):
         """ get_sensor() with no data loaded """
-        pass
+        data = self.backend.get_parameters()
+        self.assertEqual(len(data), 0)
 
     def test_get_parameter_data(self):
         """ get_sensor() with data loaded"""
@@ -259,19 +287,34 @@ class TestMysql(unittest.TestCase):
         pass
 
     def test_delete_parameter(self):
-        pass
+        self.demo_platform()
+        self.demo_sensor()
+        self.demo_parameter()
+        self.backend.delete_parameter(
+            SampleData.sample_platform_id,
+            SampleData.sample_sensor_manufacturer,
+            SampleData.sample_sensor_model,
+            SampleData.sample_sensor_serial_number,
+            SampleData.sample_parameter_phenomena)
+        data = self.backend.get_parameters()
+        self.assertEqual(len(data), 0)
 
     #
     # get_parameters()
     #
     def test_get_parameters_no_data(self):
         """ get_parameters() with no data loaded """
-        pass
+        data = self.backend.get_parameters()
+        self.assertEqual(len(data), 0)
 
     def test_get_parameters_data(self):
         """ get_parameters() with data loaded"""
-        pass
+        self.demo_platform()
+        self.demo_sensor()
+        self.demo_parameter()
 
+        data = self.backend.get_parameters()
+        self.assertEqual(len(data), 1)
 
 if __name__ == "__main__":
     unittest.main()

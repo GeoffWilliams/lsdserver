@@ -50,7 +50,7 @@ class Sensor(Base):
 class Parameter(Base):
     __tablename__ = 'parameter'
     platform_id = Column(String(FIELD_LENGTH), primary_key=True)
-    manufacturer = Column(String(FIELD_LENGTH),primary_key=True)
+    manufacturer = Column(String(FIELD_LENGTH), primary_key=True)
     model = Column(String(FIELD_LENGTH), primary_key=True)
     serial_number = Column(String(FIELD_LENGTH), primary_key=True)
     phenomena = Column(String(100))
@@ -101,8 +101,16 @@ class Mysql(LsdBackend):
         self.session.add(platform)
         self.session.commit()
 
-    def create_sensor(self, platform_id, sensor_id, data):
-        pass
+    def create_sensor(self, data):
+        sensor = Sensor()
+        sensor.platform_id = data["platform_id"]
+        sensor.manufacturer = data["manufacturer"]
+        sensor.model = data["model"]
+        sensor.serial_number = data["serial_number"]
+        sensor.description = data["description"]
+        sensor.info = data["info"]
+        self.session.add(sensor)
+        self.session.commit()
 
     def update_platform(self, data):
         pass
@@ -111,19 +119,51 @@ class Mysql(LsdBackend):
         pass
 
     def delete_platform(self, platform_id):
-        pass
+        platform = self.session.query(Platform).filter_by(
+            platform_id=platform_id).first()
+        self.session.delete(platform)
+        self.session.commit()
 
-    def delete_sensor(self, platform_id, sensor_id):
-        pass
+    def delete_sensor(self, platform_id, manufacturer, model, serial_number):
+        sensor = self.session.query(Sensor).filter_by(
+            platform_id=platform_id,
+            manufacturer=manufacturer,
+            model=model,
+            serial_number=serial_number).first()
+        self.session.delete(sensor)
+        self.session.commit()
 
-    def create_parameter(self, parameter_id, data):
-        pass
+    def create_parameter(self, data):
+        parameter = Parameter()
+        parameter.platform_id = data["platform_id"]
+        parameter.manufacturer = data["manufacturer"]
+        parameter.model = data["model"]
+        parameter.serial_number = data["serial_number"]
+        parameter.phenomena = data["phenomena"]
+        self.session.add(parameter)
+        self.session.commit()
 
     def get_parameter(self, parameter_id):
         pass
 
-    def delete_parameter(self, parameter_id):
-        pass
+    def delete_parameter(self,
+                         platform_id,
+                         manufacturer,
+                         model,
+                         serial_number,
+                         phenomena):
+        parameter = self.session.query(Parameter).filter_by(
+            platform_id=platform_id,
+            manufacturer=manufacturer,
+            model=model,
+            serial_number=serial_number,
+            phenomena=phenomena
+            ).first()
+        if parameter:
+            self.session.delete(parameter)
+            self.session.commit()
+        else:
+            print "non found"
 
     def get_parameters(self):
         pass
@@ -147,10 +187,18 @@ class Mysql(LsdBackend):
         pass
 
     def get_sensors(self, platform_id=None, manufacturer=None, model=None):
-        pass
+        data = self.session.query(Sensor).all()
+        result = []
+        for row in data:
+            result.append(row.__dict__)
+        return result
 
     def get_parameters(self, platform_id=None, manufacturer=None, model=None, serial_number=None):
-        pass
+        data = self.session.query(Parameter).all()
+        result = []
+        for row in data:
+            result.append(row.__dict__)
+        return result
 
     def get_flags(self):
         pass
