@@ -20,7 +20,7 @@
 import flask
 from lsdserver.driver import LsdBackend
 
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func, ForeignKeyConstraint
+from sqlalchemy import Sequence, Column, DateTime, String, Integer, ForeignKey, func, ForeignKeyConstraint
 from sqlalchemy.orm import relationship, backref
 #from sqlalchemy.ext.declarative import declarative_base
 from lsdserver.base import Base
@@ -54,14 +54,28 @@ class Parameter(Base):
     model = Column(String(FIELD_LENGTH), primary_key=True)
     serial_number = Column(String(FIELD_LENGTH), primary_key=True)
     phenomena = Column(String(100))
+    observation_link = Column(Integer, unique=True, primary_key=True)
     __table_args__ = (ForeignKeyConstraint([platform_id, manufacturer, model, serial_number],
                                            [Sensor.platform_id, Sensor.manufacturer, Sensor.model, Sensor.serial_number]),
                       {})
+
+class ObservationLink(Base):
+    __tablename__ = 'observation_link'
+    observation_link_id = Column(Integer, autoincrement=True, primary_key=True)
+
+class Observation():
+    timestamp = Column(DateTime, primary_key=True)
+    value = Column(Integer)
 
 
 class Mysql(LsdBackend):
 
     session = None
+
+    def build_observation_table(self, link):
+        classname = "o_" + str(link)
+        table = type(classname, (Base, Observation), {'__tablename__' : classname})
+        return table
 
     def get_platform(self, platform_id):
         obj = self.session.query(Platform).filter(Platform.platform_id == platform_id).first()
@@ -134,14 +148,23 @@ class Mysql(LsdBackend):
         self.session.commit()
 
     def create_parameter(self, data):
+        # Allocate a new observation table
+        observation_link = ObservationLink()
+        observation_link = self.session.merge(observation_link)
+
         parameter = Parameter()
         parameter.platform_id = data["platform_id"]
         parameter.manufacturer = data["manufacturer"]
         parameter.model = data["model"]
         parameter.serial_number = data["serial_number"]
         parameter.phenomena = data["phenomena"]
+        parameter.observation_link = observation_link.observation_link_id
         self.session.add(parameter)
         self.session.commit()
+
+        # once committed, there should be a value in parameter.observation_link
+        self.build_observation_table(
+            parameter.observation_link).__table__.create(self.session.bind) #bind=engine)
 
     def get_parameter(self, parameter_id):
         pass

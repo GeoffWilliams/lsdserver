@@ -1,1 +1,32 @@
-parameters list
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel=stylesheet type=text/css href="{{url_for('static', filename='style.css')}}">
+        <title>Parameters</title>
+    </head>
+    <body>
+        <h1>Parameters</h1>
+        {% if data %}
+        <table>
+            <tr>
+                <th>platform_id</th>
+                <th>manufacturer</th>
+                <th>model</th>
+                <th>serial_number</th>
+                <th>phenomena</th>
+            </tr>
+            {% for d in data %}
+                <tr>
+                    <td><a href="./{{d.platform_id}}">{{ d.platform_id }}</a></td>
+                    <td>{{ d.manufacturer }}</td>
+                    <td>{{ d.model }}</td>
+                    <td>{{ d.serial_number }}</td>
+                    <td>{{ d.phenomena }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            NONE FOUND!
+        {% endif %}
+    </body>
+</html>
