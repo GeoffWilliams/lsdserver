@@ -22,3 +22,6 @@ Still, here's a cool screenshot of the main page just to prove this still even r
 A REST web service and GUI for viewing and managing [Linked Data](https://en.wikipedia.org/wiki/Linked_data) - A powerful concept for modelling data relationships that's been built into the web since day 1.
 
 The idea is to provide a quick and easy way to apply these concepts to [Time Series Data](https://en.wikipedia.org/wiki/Time_series) so that useful data can be delivered with minimal complexity.  The idea is to hook this up to a half finished DIY weather station I built with an Arduino...
+
+### What's this got to do with Puppet/work?
+Absolutely nothing ;-)  Although I was looking at similar concepts in my last contract assignment.
